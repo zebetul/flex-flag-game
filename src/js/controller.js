@@ -1,5 +1,6 @@
 import 'core-js/stable';
 import 'regenerator-runtime';
+
 import consoleView from './views/consoleView';
 import flagIcons from './flagIcons';
 import { wait } from './helpers';
@@ -9,6 +10,7 @@ import menuItems from './menuItems';
 import { menuItemsAnim } from './animations';
 import Player from './Player';
 import PlayerView from './views/PlayerView';
+import { state } from './model';
 
 import flagFilled from 'url:/assets/icons/flag-filled.png';
 import flagRed from 'url:/assets/icons/flag-red.png';
@@ -16,10 +18,19 @@ import flagEmpty from 'url:/assets/icons/flag-empty.png';
 
 gsap.registerPlugin(MotionPathPlugin);
 
+// instantiate players from Player class
+const player1 = new Player(0, 300, 10);
+const player2 = new Player(1, 180, 5);
+
+// instantiate playerViews, one for each player
+const player1View = new PlayerView(0);
+const player2View = new PlayerView(1);
+const playerViews = [player1View, player2View];
+
 const main = document.querySelector('main');
 const sections = document.querySelectorAll('.section');
 const playerName = document.querySelectorAll('.score__player');
-const scoreContainer = document.querySelectorAll('.score__score');
+// const scoreContainer = document.querySelectorAll('.score__score');
 const countriesListContainer = document.querySelectorAll('.countries__list');
 const turnsContainer = document.querySelectorAll('.turns');
 const turnsLabel = document.querySelectorAll('.turns__label');
@@ -106,9 +117,11 @@ const initData = function () {
   // start timer for active player
   intervalID = setInterval(timer, 1000, activePlayer);
 
-  // setting score for each player
   score[0] = score[1] = 0;
-  scoreContainer.forEach((cont, i) => (cont.textContent = score[i]));
+  // scoreContainer.forEach((cont, i) => (cont.textContent = score[i]));
+
+  // setting score for each player
+  // [player1View, player2View].forEach((view, i) => view.renderScore(score[i]));
 
   // setting turns left for each player
   turnsLeft[0] =
@@ -530,35 +543,8 @@ const initAnim = async function () {
 
 // ----------> GUESS OUTCOME ANIMATIONS -----------------
 const outcomeAnimation = async function (outcome) {
-  // outcome positive(true): highlight country in countries list
   if (outcome) {
-    gsap.to(countriesListContainer[activePlayer], {
-      backgroundColor: 'green',
-      y: '-2rem',
-      scale: 1.5,
-      repeat: 1,
-      ease: 'power4.out',
-      yoyo: true,
-      yoyoEase: true,
-      duration: 1,
-    });
-
-    // score scale up if guess correct
-    gsap.to(scoreContainer[activePlayer], {
-      scale: 1.5,
-      repeat: 1,
-      yoyo: true,
-      yoyoEase: true,
-      duration: 1,
-      ease: 'power4.out',
-    });
-
-    // - add points to score counter animation
-    for (let i = 1; i <= points; i++) {
-      score[activePlayer] += 1;
-      scoreContainer[activePlayer].textContent = score[activePlayer];
-      await wait(1 / points);
-    }
+    await playerViews[activePlayer].renderScore(5);
   }
 
   // outcome negative(false): country red highlight if guess missed
@@ -580,14 +566,9 @@ const startNew = async function () {
   numberOfPlayers();
   await initAnim();
 
-  const player1 = new Player(0, 180, 5);
-  const player2 = new Player(1, 180, 5);
-
-  const player1View = new PlayerView(0);
-  const player2View = new PlayerView(1);
-
-  player1View.render(0);
-  player2View.render(0);
+  // save players to state
+  state.addPlayer(player1);
+  state.addPlayer(player2);
 
   initData();
 
