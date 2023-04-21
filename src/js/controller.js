@@ -7,6 +7,8 @@ import * as animations from './animations';
 import gameTitle from './gameTitle';
 import menuItems from './menuItems';
 import { menuItemsAnim } from './animations';
+import Player from './Player';
+import PlayerView from './views/PlayerView';
 
 import flagFilled from 'url:/assets/icons/flag-filled.png';
 import flagRed from 'url:/assets/icons/flag-red.png';
@@ -21,8 +23,7 @@ const scoreContainer = document.querySelectorAll('.score__score');
 const countriesListContainer = document.querySelectorAll('.countries__list');
 const turnsContainer = document.querySelectorAll('.turns');
 const turnsLabel = document.querySelectorAll('.turns__label');
-const flagCountContainer = document.querySelectorAll('.flag__count');
-const timersContainer = document.querySelectorAll('.timer');
+
 const buttonsContainer = document.querySelectorAll('.buttons');
 
 const btnsHelp = document.querySelectorAll('.btn__help');
@@ -96,6 +97,8 @@ const deactivatePlayer = function (player) {
 
 // New game initial conditions (score, turns left, timers, guessValues)
 const initData = function () {
+  const timersContainer = document.querySelectorAll('.timer');
+
   // setting player1 as active
   activePlayer = 0;
   activatePlayer(activePlayer);
@@ -137,6 +140,7 @@ const renderTimer = function () {
   const seconds = (timers[activePlayer] % 60).toString().padStart(2, '0');
 
   // display updated timer
+  const timersContainer = document.querySelectorAll('.timer');
   timersContainer[activePlayer].textContent = `${minutes}:${seconds}`;
 
   // 20 seconds left timer animation
@@ -202,8 +206,6 @@ const renderCountriesList = async function () {
 
     if (!res.ok) throw new Error(countriesList);
 
-    console.log(res);
-
     // extracting array with country names and cca2 [countryName, cca2]
     countryNames = countriesList.map(country => [
       country.name.common,
@@ -249,7 +251,6 @@ const renderCountryData = async function () {
 
     // deleting it from the array to not select it again in the same game
     country = countryNames.splice(rnd, 1)[0];
-    console.log(country);
 
     // fetching data about country from API
     const data = await fetch(
@@ -420,6 +421,7 @@ const switchPlayer = function () {
 // flags graphic: displays a filled flag for every remaining turn(red or blue depending on turns outcome) and an empty one for the rest
 const renderFlagIcons = function (player) {
   // reseting flag icons container
+  const flagCountContainer = document.querySelectorAll('.flag__count');
   flagCountContainer[player].textContent = '';
 
   // function that returns flag icon source depending on guess outcome
@@ -478,17 +480,17 @@ const endGame = async function () {
 // ----------> ANIMATIONS --------
 // game intro(load) animation
 const loadAnimation = async function () {
-  // renders flag icons in main console
-  consoleView.render(flagIcons.generateMarkUp());
+  // // Rendering flag icons in console view
+  // consoleView.render(flagIcons.generateMarkUp());
+  // await animations.flagAnimation();
 
-  await animations.flagAnimation();
-
+  // Rendering title in console view
   consoleView.render(
     [gameTitle.generateMarkUp(), menuItems.generateMarkUp()].join('')
   );
+  // animations.titleAnimation();
 
-  animations.titleAnimation();
-  await wait(1.7);
+  // await wait(1.7);
 
   animations.menuItemsAnim();
 };
@@ -577,7 +579,18 @@ const outcomeAnimation = async function (outcome) {
 const startNew = async function () {
   numberOfPlayers();
   await initAnim();
+
+  const player1 = new Player(0, 180, 5);
+  const player2 = new Player(1, 180, 5);
+
+  const player1View = new PlayerView(0);
+  const player2View = new PlayerView(1);
+
+  player1View.render(0);
+  player2View.render(0);
+
   initData();
+
   await renderCountriesList();
   await renderCountryData();
   btnsHelp.forEach(btn => btn.addEventListener('click', renderFact));
