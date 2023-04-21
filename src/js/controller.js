@@ -1,3 +1,5 @@
+import 'core-js/stable';
+import 'regenerator-runtime';
 import consoleView from './views/consoleView';
 import flagIcons from './flagIcons';
 import { wait } from './helpers';
@@ -5,6 +7,10 @@ import * as animations from './animations';
 import gameTitle from './gameTitle';
 import menuItems from './menuItems';
 import { menuItemsAnim } from './animations';
+
+import flagFilled from 'url:/assets/icons/flag-filled.png';
+import flagRed from 'url:/assets/icons/flag-red.png';
+import flagEmpty from 'url:/assets/icons/flag-empty.png';
 
 gsap.registerPlugin(MotionPathPlugin);
 
@@ -418,11 +424,11 @@ const renderFlagIcons = function (player) {
 
   // function that returns flag icon source depending on guess outcome
   const flagSource = function (i) {
-    let src = './assets/icons/flag.png';
+    let src = flagEmpty;
     if (turns - turnsLeft[player] >= i && guessValues[activePlayer][i - 1])
-      src = './assets/icons/filled.png';
+      src = flagFilled;
     if (turns - turnsLeft[player] >= i && !guessValues[activePlayer][i - 1])
-      src = './assets/icons/red.png';
+      src = flagRed;
 
     return src;
   };
@@ -485,10 +491,6 @@ const loadAnimation = async function () {
   await wait(1.7);
 
   animations.menuItemsAnim();
-
-  // await titleAnimation();
-  // await modalItemsAnim();
-  // renderFlags2();
 };
 
 // start new game animation(modal window and player section sliders in/out)
@@ -521,11 +523,7 @@ const initAnim = async function () {
   await wait(1);
 
   // slide out modal window
-  gsap.to('.modal__window', {
-    y: '-80rem',
-    display: 'none',
-    duration: 1,
-  });
+  consoleView.slideOut();
 };
 
 // ----------> GUESS OUTCOME ANIMATIONS -----------------
