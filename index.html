@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="src/styles/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600&display=swap"
+      rel="stylesheet"
+    />
+    <title>Flagspert</title>
+    <script type="module" src="./src/js/controller.js"></script>
+  </head>
+
+  <body>
+    <main>
+      <section class="section section__0">
+
+        <div class="timer__container">
+          <div class="timer"></div>
+          <div class="flag__count"></div>
+        </div>
+
+        <div class="score">
+          <h1 class="score__player">Player 1</h1>
+          <h2 class="score__score">0</h2>
+        </div>
+
+        <div class="countries">
+          <label class="countries__label">Select a country</label>
+          <select
+            class="countries__list list__0"
+            name="countries"
+            id="countries"
+          ></select>
+        </div>
+
+        <!-- <div class="buttons"> -->
+          <button class="btn btn__guess btn__0">Guess</button>
+          <button class="btn btn__help btn__0">Help</button>
+        <!-- </div> -->
+      </section>
+
+      <section class="section section__1">
+        <div class="timer__container">
+          <div class="timer"></div>
+          <div class="flag__count"></div>
+          </div>
+        </div>
+
+        <div class="score">
+          <h1 class="score__player">Player 2</h1>
+          <h2 class="score__score">0</h2>
+        </div>
+
+        <div class="countries">
+          <label class="countries__label">Select a country</label>
+          <select
+            class="countries__list list__1"
+            name="countries"
+            id="countries"
+          ></select>
+        </div>
+
+          <button class="btn btn__guess btn__1">Guess</button>
+          <button class="btn btn__help btn__1">Help</button>
+      </section>
+
+      <article class="country">        
+        <h3 class="country__name"></h3>
+
+        <img class="country__img" src=" " />
+
+        <div class="country__data"></div>
+
+      </article>
+
+      <div  class="console__window">
+
+        <!-- <div class="game__name">FLAG-X</div> -->
+
+
+
+
+      </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/MotionPathPlugin.min.js"></script>
+  </body>
+</html>

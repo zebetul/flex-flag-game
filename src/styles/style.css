@@ -1,0 +1,363 @@
+:root {
+  --color-primary: rgba(255, 255, 255, 0.048);
+  --color-secondary: rgb(0, 140, 255);
+  --color-tertiary: black;
+  --gradient-primary: linear-gradient(135deg, #4e515275 0%, #67608a6c 100%);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: inherit;
+}
+
+/* Adjust the default font size in body to rem to be more responsive */
+html {
+  font-size: 62.5%;
+}
+
+body {
+  box-sizing: border-box;
+  font-size: 1.6rem;
+  font-family: Poppins;
+  height: 100vh;
+  color: rgb(255, 255, 255);
+  background-image: var(--gradient-primary);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+header {
+  font-size: 4rem;
+}
+
+main {
+  position: relative;
+  height: 60rem;
+  width: 120rem;
+
+  display: flex;
+  justify-content: space-between;
+}
+
+/* ----------- SECTION --------------- */
+.section {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 0%);
+  height: 100%;
+  width: 35rem;
+
+  display: none;
+  flex-direction: column;
+  align-items: center;
+
+  box-shadow: 20px 20px 60px 26px rgba(0, 0, 0, 0.062);
+  background-color: var(--color-primary);
+  opacity: 0.7;
+
+  filter: brightness(0.5);
+
+  border: 1px solid rgba(0, 140, 255, 0.5);
+  border-radius: 10px;
+}
+
+.player--active {
+  background-color: rgba(255, 255, 255, 0.116);
+  opacity: 1;
+  filter: none;
+}
+
+.player--active .countries {
+  display: flex;
+}
+
+/* .player--active .btn {
+  display: block;
+} */
+
+/* --------- COUNTRY FLAG AND DATA ---------- */
+.country {
+  position: absolute;
+
+  left: 50%;
+  transform: translate(-50%, 0%);
+  height: 60rem;
+  width: 40rem;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  opacity: 0;
+  transition: opacity 1s;
+  overflow: hidden;
+
+  color: #333;
+  box-shadow: 20px 20px 60px 26px rgba(0, 0, 0, 0.062);
+  background-color: var(--color-primary);
+  border: 1px solid rgba(0, 140, 255, 0.5);
+  border-radius: 10px;
+}
+
+.country__name {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+
+  margin: 2rem 0rem;
+  font-size: 3rem;
+}
+
+.country__img {
+  width: 30rem;
+  height: 20rem;
+  /* object-fit: fill; */
+  /* object-fit: cover; */
+  /* object-fit: contain; */
+  /* object-fit: scale-down; */
+  /* object-fit: none; */
+
+  /* outline: auto; */
+}
+
+.country__data {
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  overflow: hidden;
+}
+
+.country__row {
+  font-size: 1.7rem;
+}
+
+/* ----------- PLAYER ----------- */
+/* TIMER */
+.timer__container {
+  position: absolute;
+  top: 2rem;
+  width: 30rem;
+  display: flex;
+  justify-content: space-between;
+  font-size: 2rem;
+  font-weight: 500;
+}
+
+.flag__count {
+  position: relative;
+  top: 3px;
+  display: flex;
+}
+
+.flag__icon {
+  width: 2.2rem;
+  height: 2.2rem;
+  object-fit: scale-down;
+}
+
+.turns {
+  color: var(--color-secondary);
+}
+
+.timer {
+  color: var(--color-secondary);
+}
+
+/* SCORE */
+.score {
+  margin: 10rem 0 5rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 2rem;
+}
+
+.score__player {
+  color: #333;
+  font-size: 3rem;
+}
+
+.score__score {
+  font-size: 4rem;
+  color: var(--color-secondary);
+}
+
+/* COUNTRIES LIST */
+.countries {
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  display: none;
+  color: #333;
+}
+
+.countries__label {
+  font-size: 1.5rem;
+}
+
+.countries__list {
+  display: flex;
+  justify-content: center;
+  width: 25rem;
+  cursor: pointer;
+  font-size: 1.7rem;
+  border: none;
+  border-radius: 5px;
+  align-items: center;
+}
+
+/* ----------- BUTTONS -------------- */
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12rem;
+  display: none;
+
+  outline: auto;
+}
+
+.btn {
+  position: relative;
+  top: -10%;
+  border: none;
+  width: 9rem;
+  height: 4rem;
+  font-size: 2rem;
+  border-radius: 5px;
+  border: 1px solid rgba(0, 140, 255, 0.5);
+  background-color: rgba(245, 245, 245, 0.39);
+  /* box-shadow: 12px 12px 34px 15px rgba(0, 0, 0, 0.1); */
+  opacity: 0.7;
+  cursor: pointer;
+}
+
+.btn:hover {
+  opacity: 1;
+  color: var(--color-secondary);
+}
+
+.btn__guess {
+  position: absolute;
+  top: 37rem;
+  display: none;
+}
+
+.btn__help {
+  position: absolute;
+  top: 47rem;
+  margin-top: 2rem;
+  display: none;
+}
+
+/* ------------------ MODAL WINDOW ------------- */
+.console__window {
+  position: absolute;
+
+  left: 50%;
+  transform: translate(-50%, 0%);
+  height: 60rem;
+  width: 40rem;
+
+  padding: 23rem 10rem 0 10rem;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--color-tertiary);
+  /* filter: brightness(0.8); */
+  /* filter: opacity(0.8); */
+
+  /* box-shadow: 20px 20px 60px 26px rgba(0, 0, 0, 0.062); */
+  background-color: rgba(188, 187, 192, 255);
+  border-radius: 10px;
+  border: 1px solid rgba(0, 140, 255, 0.5);
+  font-size: 1.5rem;
+  z-index: 100;
+
+  overflow: hidden;
+}
+
+.hidden {
+  display: none;
+}
+
+.game__title {
+  position: absolute;
+  top: 9rem;
+  left: -30rem;
+  transform: translate(-50%, -50%);
+  display: flex;
+  overflow: visible;
+  z-index: 1000;
+
+  outline: auto;
+}
+
+.modal__label {
+  position: relative;
+  margin-top: 2rem;
+  left: -35rem;
+}
+
+.modal__select {
+  position: relative;
+  left: -35rem;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+/* the numbers after the radio boxes */
+label {
+  font-size: 2rem;
+}
+
+.radio__box {
+  display: flex;
+  justify-content: center;
+
+  /* margin: 1rem 2rem; */
+  width: 4rem;
+  /* padding-left: 15rem; */
+  /* margin-left: 1rem; */
+
+  color: var(--color-tertiary);
+  font-size: 1.5rem;
+}
+
+.radio__box:checked {
+  opacity: 1;
+}
+
+.flags__select {
+  outline: auto;
+}
+
+.btn__start {
+  position: absolute;
+  left: -19rem;
+  top: 80%;
+  right: 50%;
+  transform: translate(50%, 0);
+}
+
+.flag__intro {
+  position: absolute;
+  top: -1rem;
+  left: 20rem;
+  width: 10rem;
+  height: 12rem;
+  /* left: 160rem; */
+  /* left: 50rem; */
+  /* transform: translate(50%, 50%); */
+}
