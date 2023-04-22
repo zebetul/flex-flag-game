@@ -1,4 +1,5 @@
-import { wait } from '../helpers';
+import { formatTimer } from '../helpers';
+import { TIME_WARNING } from '../config';
 
 export default class PlayerView {
   #playerNumber;
@@ -104,11 +105,30 @@ export default class PlayerView {
     }
   }
 
-  // renderScore(score) {
-  //   this.#scoreElement.textContent = score;
-  // }
-
-  renderTimer(timeLeft) {
-    this.#scoreElement.textContent = timeLeft;
+  #timerBlinkAnim() {
+    gsap.fromTo(
+      this.#timerElement,
+      {
+        opacity: 0,
+      },
+      {
+        opacity: 1,
+        color: 'red',
+        duration: 0.5,
+      }
+    );
   }
+
+  renderTimer(seconds) {
+    // formating the time left in m:ss
+    const timeLeft = formatTimer(seconds);
+
+    // displaying formated timer
+    this.#timerElement.textContent = timeLeft;
+
+    // if less than 20 seconds left then timer blinks red
+    if (seconds < TIME_WARNING) this.#timerBlinkAnim();
+  }
+
+  renderFlags() {}
 }

@@ -35,7 +35,7 @@ class MenuItems {
           type="radio"
           id="time__1"
           name="time"
-          value="1"
+          value="0.5"
         />
         <label for="time__1">&nbsp1</label>
       </div>

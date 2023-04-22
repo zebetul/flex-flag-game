@@ -147,38 +147,14 @@ const initData = function () {
 };
 
 // formats and displays timer in m:ss
-const renderTimer = function () {
-  // formating remaining minutes and seconds to display
-  const minutes = Math.trunc(timers[activePlayer] / 60);
-  const seconds = (timers[activePlayer] % 60).toString().padStart(2, '0');
-
-  // display updated timer
-  const timersContainer = document.querySelectorAll('.timer');
-  timersContainer[activePlayer].textContent = `${minutes}:${seconds}`;
-
-  // 20 seconds left timer animation
-  if (timers[activePlayer] < 20) {
-    const timerBlinkAnim = gsap.fromTo(
-      timersContainer[activePlayer],
-      {
-        opacity: 0,
-      },
-      {
-        opacity: 1,
-        color: 'red',
-        duration: 0.5,
-      }
-    );
-  }
-};
+const renderTimer = function () {};
 
 // updates active player's timer decreasing it every second
 const timer = function () {
   // decrease timer for active player
   timers[activePlayer] -= 1;
 
-  // display timer
-  renderTimer();
+  playerViews[activePlayer].renderTimer(timers[activePlayer]);
 
   // ----------> TIME IS UP END GAME SCENARIOS
   // if there are two players and active player's timer falls bellow 0 than change player
