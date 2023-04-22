@@ -130,8 +130,8 @@ const initData = function () {
       document.querySelector('input[name="flags"]:checked').value;
 
   // displaying turns left for each player
-  renderFlagIcons(0);
-  renderFlagIcons(1);
+  playerViews[0].renderFlags(flagSource(0));
+  playerViews[1].renderFlags(flagSource(1));
 
   //   setting timers for each player
   timers[0] = timers[1] =
@@ -145,9 +145,6 @@ const initData = function () {
   // reseting guessValues
   guessValues[0].length = guessValues[1].length = 0;
 };
-
-// formats and displays timer in m:ss
-const renderTimer = function () {};
 
 // updates active player's timer decreasing it every second
 const timer = function () {
@@ -361,7 +358,7 @@ const submit = async function () {
   guessOutcome();
 
   // display remaining turns for current player
-  renderFlagIcons(activePlayer);
+  playerViews[activePlayer].renderFlags(flagSource(activePlayer));
 
   await wait(2);
 
@@ -408,28 +405,24 @@ const switchPlayer = function () {
 };
 
 // flags graphic: displays a filled flag for every remaining turn(red or blue depending on turns outcome) and an empty one for the rest
-const renderFlagIcons = function (player) {
-  // reseting flag icons container
-  const flagCountContainer = document.querySelectorAll('.flag__count');
-  flagCountContainer[player].textContent = '';
+// function that returns flag icon source depending on guess outcome
+const flagSource = function (player) {
+  const sources = [];
 
-  // function that returns flag icon source depending on guess outcome
-  const flagSource = function (i) {
+  for (let i = 1; i <= turns; i++) {
     let src = flagEmpty;
     if (turns - turnsLeft[player] >= i && guessValues[activePlayer][i - 1])
       src = flagFilled;
     if (turns - turnsLeft[player] >= i && !guessValues[activePlayer][i - 1])
       src = flagRed;
 
-    return src;
-  };
-
-  // creating flag icon elements for every turn
-  for (let i = 1; i <= turns; i++) {
-    const html = `<img class="flag__icon" src="${flagSource(i)}" alt="" />`;
-    flagCountContainer[player].insertAdjacentHTML('beforeend', html);
+    sources.push(src);
   }
+
+  return sources;
 };
+
+// playerViews[activePlayer].renderFlags(flagSource());
 
 // end game modal with message, animation, options
 const endGame = async function () {

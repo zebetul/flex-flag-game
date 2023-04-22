@@ -1,4 +1,4 @@
-import { formatTimer } from '../helpers';
+import { wait, formatTimer } from '../helpers';
 import { TIME_WARNING } from '../config';
 
 export default class PlayerView {
@@ -7,6 +7,7 @@ export default class PlayerView {
   #markUp;
   #scoreElement;
   #timerElement;
+  #flagsElement;
   #countriesList;
 
   score = 0;
@@ -28,15 +29,13 @@ export default class PlayerView {
       `.timer__player${this.#playerNumber}`
     );
 
+    this.#flagsElement = document.querySelector(
+      `.flag__player${this.#playerNumber}`
+    );
+
     this.#countriesList = document.querySelector(
       `.list__${this.#playerNumber}`
     );
-  }
-
-  render() {
-    this.#clear();
-    this.#markUp = this.#generateMarkUp();
-    this.#parentElement.insertAdjacentHTML('afterbegin', this.#markUp);
   }
 
   #generateMarkUp() {
@@ -44,7 +43,7 @@ export default class PlayerView {
     <div class="timer__container">
         <div class="timer timer__player${this.#playerNumber}"></div>
         
-        <div class="flag__count"></div>
+        <div class="flag__count flag__player${this.#playerNumber}"></div>
     </div>
 
     <div class="score">
@@ -70,6 +69,26 @@ export default class PlayerView {
 
   #clear() {
     this.#parentElement.innerHTML = '';
+  }
+
+  #timerBlinkAnimation() {
+    gsap.fromTo(
+      this.#timerElement,
+      {
+        opacity: 0,
+      },
+      {
+        opacity: 1,
+        color: 'red',
+        duration: 0.5,
+      }
+    );
+  }
+
+  render() {
+    this.#clear();
+    this.#markUp = this.#generateMarkUp();
+    this.#parentElement.insertAdjacentHTML('afterbegin', this.#markUp);
   }
 
   async renderScore(score) {
@@ -105,30 +124,21 @@ export default class PlayerView {
     }
   }
 
-  #timerBlinkAnim() {
-    gsap.fromTo(
-      this.#timerElement,
-      {
-        opacity: 0,
-      },
-      {
-        opacity: 1,
-        color: 'red',
-        duration: 0.5,
-      }
-    );
-  }
-
   renderTimer(seconds) {
-    // formating the time left in m:ss
-    const timeLeft = formatTimer(seconds);
-
-    // displaying formated timer
-    this.#timerElement.textContent = timeLeft;
+    // formating the time left in m:ss and displaying it
+    this.#timerElement.textContent = formatTimer(seconds);
 
     // if less than 20 seconds left then timer blinks red
-    if (seconds < TIME_WARNING) this.#timerBlinkAnim();
+    if (seconds < TIME_WARNING) this.#timerBlinkAnimation();
   }
 
-  renderFlags() {}
+  renderFlags(source) {
+    this.#flagsElement.textContent = '';
+
+    const markUp = source
+      .map(src => `<img class="flag__icon" src="${src}" alt="" />`)
+      .join('');
+
+    this.#flagsElement.insertAdjacentHTML('beforeend', markUp);
+  }
 }
