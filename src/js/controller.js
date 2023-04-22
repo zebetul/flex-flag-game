@@ -27,15 +27,8 @@ const player1View = new PlayerView(0);
 const player2View = new PlayerView(1);
 const playerViews = [player1View, player2View];
 
-const main = document.querySelector('main');
 const sections = document.querySelectorAll('.section');
 const playerName = document.querySelectorAll('.score__player');
-// const scoreContainer = document.querySelectorAll('.score__score');
-const countriesListContainer = document.querySelectorAll('.countries__list');
-const turnsContainer = document.querySelectorAll('.turns');
-const turnsLabel = document.querySelectorAll('.turns__label');
-
-const buttonsContainer = document.querySelectorAll('.buttons');
 
 const btnsHelp = document.querySelectorAll('.btn__help');
 const btnsGuess = document.querySelectorAll('.btn__guess');
@@ -44,9 +37,6 @@ const countryContainer = document.querySelector('.country');
 const flagContainer = document.querySelector('.country__img');
 const countryName = document.querySelector('.country__name');
 const countryDataContainer = document.querySelector('.country__data');
-
-const consoleWindow = document.querySelector('.console__window');
-const btnStart = document.querySelector('.btn__start');
 
 // single player boolean variable
 let singlePlayer;
@@ -117,11 +107,8 @@ const initData = function () {
   // start timer for active player
   intervalID = setInterval(timer, 1000, activePlayer);
 
-  score[0] = score[1] = 0;
-  // scoreContainer.forEach((cont, i) => (cont.textContent = score[i]));
-
   // setting score for each player
-  // [player1View, player2View].forEach((view, i) => view.renderScore(score[i]));
+  score[0] = score[1] = 0;
 
   // setting turns left for each player
   turnsLeft[0] =
@@ -136,11 +123,6 @@ const initData = function () {
   //   setting timers for each player
   timers[0] = timers[1] =
     document.querySelector('input[name="time"]:checked').value * 60;
-
-  // setting timer containers color blue
-  gsap.set(timersContainer, {
-    color: 'rgb(0, 140, 255)',
-  });
 
   // reseting guessValues
   guessValues[0].length = guessValues[1].length = 0;
@@ -202,17 +184,12 @@ const renderCountriesList = async function () {
     countryNames.sort();
 
     // emptying container
-    countriesListContainer.forEach(container => container.replaceChildren());
+    playerViews.forEach(view => view.clearCountriesList());
 
     // rendering list with country names
     countryNames.forEach(country => {
-      // create option element
-      const html = `<option value="${country[0]}">${country[0]}</option>`;
-
       // insert in each players list container
-      countriesListContainer.forEach(container =>
-        container.insertAdjacentHTML('beforeend', html)
-      );
+      playerViews.forEach(view => view.renderCountry(country));
     });
   } catch (err) {
     renderError(err);
@@ -333,14 +310,15 @@ const resetConditions = function () {
 
 // display outcome and ads points to score if guess correct
 const guessOutcome = async function () {
-  if (country[0] === countriesListContainer[activePlayer].value) {
+  if (country[0] === playerViews[activePlayer].getCountry()) {
     // add quess outcome boolean element to guessOutcome array for active player
     guessValues[activePlayer].push(true);
 
     // - display congrats message
-    outcomeAnimation(true);
+    await playerViews[activePlayer].renderScore(5);
   } else {
-    outcomeAnimation(false);
+    playerViews[activePlayer].renderMissedAnimation();
+
     guessValues[activePlayer].push(false);
   }
 };
@@ -434,9 +412,12 @@ const endGame = async function () {
   deactivatePlayer(0);
   deactivatePlayer(1);
 
-  // hide turns left and timers
-  flagCountContainer.forEach(cont => (cont.textContent = ''));
-  timersContainer.forEach(cont => (cont.textContent = ''));
+  // clearing turns left and timers and reseting timers color back to blue
+  playerViews.forEach(view => {
+    view.clearFlags();
+    view.clearTimer();
+    view.resetTimerColour();
+  });
 
   // empty flag container
   flagContainer.src = '';
@@ -508,26 +489,6 @@ const initAnim = async function () {
 
   // slide out modal window
   consoleView.slideOut();
-};
-
-// ----------> GUESS OUTCOME ANIMATIONS -----------------
-const outcomeAnimation = async function (outcome) {
-  if (outcome) {
-    await playerViews[activePlayer].renderScore(5);
-  }
-
-  // outcome negative(false): country red highlight if guess missed
-  else
-    gsap.to(countriesListContainer[activePlayer], {
-      backgroundColor: 'red',
-      // fontSize: '2rem',
-      // scale: 1.3,
-      repeat: 1,
-      ease: 'power4.out',
-      yoyo: true,
-      // yoyoEase: true,
-      duration: 1,
-    });
 };
 
 // ----------> START NEW GAME -------------------------------

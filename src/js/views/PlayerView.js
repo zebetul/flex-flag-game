@@ -3,12 +3,13 @@ import { TIME_WARNING } from '../config';
 
 export default class PlayerView {
   #playerNumber;
+
   #parentElement;
   #markUp;
   #scoreElement;
   #timerElement;
   #flagsElement;
-  #countriesList;
+  #countriesListElement;
 
   score = 0;
 
@@ -33,7 +34,7 @@ export default class PlayerView {
       `.flag__player${this.#playerNumber}`
     );
 
-    this.#countriesList = document.querySelector(
+    this.#countriesListElement = document.querySelector(
       `.list__${this.#playerNumber}`
     );
   }
@@ -93,7 +94,7 @@ export default class PlayerView {
 
   async renderScore(score) {
     // outcome positive(true): highlight country in countries list
-    gsap.to(this.#countriesList, {
+    gsap.to(this.#countriesListElement, {
       backgroundColor: 'green',
       y: '-2rem',
       scale: 1.5,
@@ -133,12 +134,53 @@ export default class PlayerView {
   }
 
   renderFlags(source) {
-    this.#flagsElement.textContent = '';
+    this.clearFlags();
 
     const markUp = source
       .map(src => `<img class="flag__icon" src="${src}" alt="" />`)
       .join('');
 
     this.#flagsElement.insertAdjacentHTML('beforeend', markUp);
+  }
+
+  renderCountry(data) {
+    const markUp = `<option value="${data[0]}">${data[0]}</option>`;
+
+    this.#countriesListElement.insertAdjacentHTML('beforeend', markUp);
+  }
+
+  clearFlags() {
+    this.#flagsElement.textContent = '';
+  }
+
+  clearTimer() {
+    this.#timerElement.textContent = '';
+  }
+
+  clearCountriesList() {
+    this.#countriesListElement.textContent = '';
+  }
+
+  getCountry() {
+    return this.#countriesListElement.value;
+  }
+
+  resetTimerColour() {
+    gsap.set(this.#timerElement, {
+      color: 'rgb(0, 140, 255)',
+    });
+  }
+
+  renderMissedAnimation() {
+    gsap.to(this.#countriesListElement, {
+      backgroundColor: 'red',
+      // fontSize: '2rem',
+      // scale: 1.3,
+      repeat: 1,
+      ease: 'power4.out',
+      yoyo: true,
+      // yoyoEase: true,
+      duration: 1,
+    });
   }
 }

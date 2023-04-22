@@ -1,1 +1,1 @@
-export const TIME_WARNING = 20;
+export const TIME_WARNING = 4;

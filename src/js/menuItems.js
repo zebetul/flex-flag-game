@@ -10,7 +10,7 @@ class MenuItems {
           id="player__1"
           name="drone"
           value="player__1"
-          checked
+          
         />
         <label for="player__1">&nbsp1</label>
       </div>
@@ -22,6 +22,7 @@ class MenuItems {
           id="player__2"
           name="drone"
           value="player__2"
+          checked
         />
         <label for="player__2">&nbsp2</label>
       </div>
@@ -35,7 +36,8 @@ class MenuItems {
           type="radio"
           id="time__1"
           name="time"
-          value="1"
+          value="0.1"
+          checked
         />
         <label for="time__1">&nbsp1</label>
       </div>
@@ -47,7 +49,7 @@ class MenuItems {
           id="time__3"
           name="time"
           value="3"
-          checked
+          
         />
         <label for="time__3">&nbsp3</label>
       </div>
