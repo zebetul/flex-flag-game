@@ -22,5 +22,14 @@ class ConsoleView {
       duration: 1,
     });
   }
+
+  slideIn() {
+    gsap.to(this.#parentElement, {
+      y: '0rem',
+      display: 'flex',
+      ease: 'circ',
+      duration: 1,
+    });
+  }
 }
 export default new ConsoleView();

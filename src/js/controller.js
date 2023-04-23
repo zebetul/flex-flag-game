@@ -429,12 +429,7 @@ const endGame = async function () {
   countryDataContainer.textContent = '';
 
   // slide in modal window
-  gsap.to('.modal__window', {
-    y: '0rem',
-    display: 'flex',
-    ease: 'circ',
-    duration: 1,
-  });
+  consoleView.slideIn();
 
   // display winner
   // await renderOutcomeMessage(`WINNER: ${winner}`, 5);
@@ -462,28 +457,13 @@ const loadAnimation = async function () {
 const initAnim = async function () {
   // when a two player game ended and next game will be single player -> slide back player 2
   if (singlePlayer && gsap.getProperty('.section__1', 'x') === 22)
-    gsap.to('.section__1', {
-      x: '-20rem',
-      display: 'none',
-      duration: 1,
-    });
+    player2View.slide(-22);
 
   // animate first player's section
-  gsap.to('.section__0', {
-    x: '-57rem',
-    display: 'flex',
-    duration: 1,
-    ease: 'circ',
-  });
+  player1View.slide(-57);
 
   // if double player than animate other player's section
-  if (!singlePlayer)
-    gsap.to('.section__1', {
-      x: '22rem',
-      display: 'flex',
-      duration: 1,
-      ease: 'circ',
-    });
+  if (!singlePlayer) player2View.slide(22);
 
   await wait(1);
 

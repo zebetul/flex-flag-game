@@ -183,4 +183,13 @@ export default class PlayerView {
       duration: 1,
     });
   }
+
+  slide(data) {
+    gsap.to(this.#parentElement, {
+      x: `${data}rem`,
+      display: 'flex',
+      duration: 1,
+      ease: 'circ',
+    });
+  }
 }
