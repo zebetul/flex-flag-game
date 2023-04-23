@@ -35,11 +35,6 @@ const playerName = document.querySelectorAll('.score__player');
 const btnsHelp = document.querySelectorAll('.btn__help');
 const btnsGuess = document.querySelectorAll('.btn__guess');
 
-const countryContainer = document.querySelector('.country');
-const flagContainer = document.querySelector('.country__img');
-const countryName = document.querySelector('.country__name');
-const countryDataContainer = document.querySelector('.country__data');
-
 // single player boolean variable
 let singlePlayer;
 
@@ -76,7 +71,7 @@ const turnsLeft = [];
 const timers = [];
 
 const renderError = function (err) {
-  flagContainer.insertAdjacentText('afterbegin', err);
+  countryView.renderFlag(err);
 };
 
 // assingns singlePlayer's value boolean value depending wich option was checked
@@ -203,13 +198,13 @@ const renderCountriesList = async function () {
 const renderCountryData = async function () {
   try {
     // - empty country data container
-    countryDataContainer.innerHTML = '';
+    countryView.clearFacts();
 
     // - reseting points
     points = 21;
 
     // - hide country name and display points
-    countryName.textContent = `${points}`;
+    countryView.renderName(points);
 
     // selectting a random country name
     const rnd = Math.trunc(Math.random() * countryNames.length);
@@ -229,8 +224,7 @@ const renderCountryData = async function () {
     const countryData = await data.json();
 
     // rendering flag
-    flagContainer.src = countryData[0].flags.png;
-    countryContainer.style.opacity = 1;
+    countryView.renderFlag(countryData[0].flags.png);
 
     //   creating CountryInfo array with name, capital, population, continent, language, currencies, borderCountry
     countryInfo = [
@@ -282,14 +276,7 @@ const renderFact = function () {
   )[0];
 
   // render fact
-  const html = `<p class="country__row"><span></span>${fact[0]}: ${fact[1]}</p>`;
-  countryDataContainer.insertAdjacentHTML('afterbegin', html);
-
-  // animate fact
-  gsap.from(`.country__row`, {
-    y: '-3.5rem',
-    duration: 0.5,
-  });
+  countryView.renderFact(fact);
 
   // if facts array is empty hide help button
   if (!countryInfo[0]) {
@@ -298,7 +285,7 @@ const renderFact = function () {
 
   // - decrease points
   points -= 3;
-  countryName.textContent = `${points}`;
+  countryView.renderName(points);
 };
 
 // reset conditions on turn end
@@ -332,7 +319,7 @@ const submit = async function () {
   resetConditions();
 
   // - display country name
-  countryName.textContent = country[0];
+  countryView.renderName(country[0]);
 
   // - display outcome message if guess correct => victory else fail
   guessOutcome();
@@ -420,15 +407,6 @@ const endGame = async function () {
     view.clearTimer();
     view.resetTimerColour();
   });
-
-  // empty flag container
-  flagContainer.src = '';
-
-  // emptying country name
-  countryName.textContent = '';
-
-  // empty country data
-  countryDataContainer.textContent = '';
 
   // slide in modal window
   consoleView.slideIn();

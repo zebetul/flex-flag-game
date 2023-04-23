@@ -4,7 +4,6 @@ import { View } from './View';
 
 export default class PlayerView extends View {
   #playerNumber;
-
   #scoreElement;
   #timerElement;
   #flagsElement;
