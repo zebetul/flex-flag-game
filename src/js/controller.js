@@ -32,9 +32,6 @@ const playerViews = [player1View, player2View];
 const sections = document.querySelectorAll('.section');
 const playerName = document.querySelectorAll('.score__player');
 
-const btnsHelp = document.querySelectorAll('.btn__help');
-const btnsGuess = document.querySelectorAll('.btn__guess');
-
 // single player boolean variable
 let singlePlayer;
 
@@ -81,25 +78,14 @@ const numberOfPlayers = function () {
   if (document.querySelector('.player__2').checked) singlePlayer = false;
 };
 
-// adding active player class and displaying buttons
-const activatePlayer = function (player) {
-  sections[player].classList.add('player--active');
-  gsap.set(`.btn__${player}`, { display: 'block' });
-};
-
-const deactivatePlayer = function (player) {
-  // deactivating current player
-  sections[player].classList.remove('player--active');
-  gsap.set(`.btn__${player}`, { display: 'none' });
-};
-
 // New game initial conditions (score, turns left, timers, guessValues)
 const initData = function () {
   const timersContainer = document.querySelectorAll('.timer');
 
   // setting player1 as active
   activePlayer = 0;
-  activatePlayer(activePlayer);
+
+  playerViews[activePlayer].activatePlayer();
 
   // start timer for active player
   intervalID = setInterval(timer, 1000, activePlayer);
@@ -141,7 +127,7 @@ const timer = function () {
     // setting single player true for the rest of the game
     singlePlayer = true;
 
-    deactivatePlayer(activePlayer);
+    playerViews[activePlayer].deactivatePlayer();
 
     switchPlayer();
   }
@@ -330,14 +316,14 @@ const submit = async function () {
   await wait(2);
 
   if (!singlePlayer) {
-    deactivatePlayer(activePlayer);
+    playerViews[activePlayer].deactivatePlayer();
 
     // stop current player's timer
     clearInterval(intervalID);
   }
 
   // if single player at end turn, show buttons
-  if (singlePlayer) activatePlayer(activePlayer);
+  if (singlePlayer) playerViews[activePlayer].activatePlayer();
 
   // ---------->  NO TURNS LEFT END GAME SCENARIOS
   // if there are no turns left then end the game
@@ -365,7 +351,7 @@ const switchPlayer = function () {
   // - switching active player
   activePlayer ? (activePlayer = 0) : (activePlayer = 1);
 
-  activatePlayer(activePlayer);
+  playerViews[activePlayer].activatePlayer();
 
   // start timer for new active player
   intervalID = setInterval(timer, 1000, activePlayer);
@@ -398,8 +384,8 @@ const endGame = async function () {
     score[0] > score[1] ? playerName[0].textContent : playerName[1].textContent;
 
   // deactivate both players
-  deactivatePlayer(0);
-  deactivatePlayer(1);
+  playerViews[0].deactivatePlayer();
+  playerViews[1].deactivatePlayer();
 
   // clearing turns left and timers and reseting timers color back to blue
   playerViews.forEach(view => {
@@ -464,8 +450,11 @@ const startNew = async function () {
 
   await renderCountriesList();
   await renderCountryData();
-  btnsHelp.forEach(btn => btn.addEventListener('click', renderFact));
-  btnsGuess.forEach(btn => btn.addEventListener('click', submit));
+
+  playerViews.forEach(view => view.addHandlerGuess(submit));
+  playerViews.forEach(view => view.addHandlerHelp(renderFact));
+  // btnsHelp.forEach(btn => btn.addEventListener('click', renderFact));
+  // btnsGuess.forEach(btn => btn.addEventListener('click', submit));
 };
 
 // ----------> INIT ---------------
@@ -474,5 +463,5 @@ const startNew = async function () {
 
   await loadAnimation();
 
-  consoleView.addHandlerRender(startNew);
+  consoleView.addHandlerStart(startNew);
 })();

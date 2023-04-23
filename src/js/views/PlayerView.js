@@ -8,6 +8,8 @@ export default class PlayerView extends View {
   #timerElement;
   #flagsElement;
   #countriesListElement;
+  #btnHelp;
+  #btnGuess;
 
   score = 0;
 
@@ -39,6 +41,12 @@ export default class PlayerView extends View {
     this.#countriesListElement = document.querySelector(
       `.list__${this.#playerNumber}`
     );
+
+    this.#btnHelp = document.querySelector(`.btn__help__${this.#playerNumber}`);
+
+    this.#btnGuess = document.querySelector(
+      `.btn__guess__${this.#playerNumber}`
+    );
   }
 
   #generateMarkUp() {
@@ -65,8 +73,10 @@ export default class PlayerView extends View {
         ></select>
     </div>
 
-    <button class="btn btn__guess btn__${this.#playerNumber}">Guess</button>
-    <button class="btn btn__help btn__${this.#playerNumber}">Help</button>
+    <button class="btn btn__guess btn__guess__${
+      this.#playerNumber
+    }">Guess</button>
+    <button class="btn btn__help btn__help__${this.#playerNumber}">Help</button>
     `;
   }
 
@@ -82,6 +92,14 @@ export default class PlayerView extends View {
         duration: 0.5,
       }
     );
+  }
+
+  addHandlerGuess(handler) {
+    this.#btnGuess.addEventListener('click', handler);
+  }
+
+  addHandlerHelp(handler) {
+    this.#btnHelp.addEventListener('click', handler);
   }
 
   async renderScore(score) {
@@ -183,5 +201,17 @@ export default class PlayerView extends View {
       duration: 1,
       ease: 'circ',
     });
+  }
+
+  // adds active player class and displays buttons
+  activatePlayer() {
+    this.parentElement.classList.add('player--active');
+    gsap.set([this.#btnHelp, this.#btnGuess], { display: 'block' });
+  }
+
+  // adds active player class and removes buttons
+  deactivatePlayer() {
+    this.parentElement.classList.remove('player--active');
+    gsap.set([this.#btnHelp, this.#btnGuess], { display: 'none' });
   }
 }

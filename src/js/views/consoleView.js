@@ -6,7 +6,7 @@ class ConsoleView extends View {
     this.parentElement = document.querySelector('.console__window');
   }
 
-  addHandlerRender(handler) {
+  addHandlerStart(handler) {
     document.querySelector('.btn__start').addEventListener('click', handler);
   }
 
