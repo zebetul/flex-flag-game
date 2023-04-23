@@ -1,11 +1,10 @@
 import { wait, formatTimer } from '../helpers';
 import { TIME_WARNING } from '../config';
+import { View } from './View';
 
-export default class PlayerView {
+export default class PlayerView extends View {
   #playerNumber;
 
-  #parentElement;
-  #markUp;
   #scoreElement;
   #timerElement;
   #flagsElement;
@@ -14,11 +13,15 @@ export default class PlayerView {
   score = 0;
 
   constructor(playerNumber) {
+    super();
+
     this.#playerNumber = playerNumber;
 
-    this.#parentElement = document.querySelector(
+    this.parentElement = document.querySelector(
       `.section__${this.#playerNumber}`
     );
+
+    this.markUp = this.#generateMarkUp();
 
     this.render();
 
@@ -68,10 +71,6 @@ export default class PlayerView {
     `;
   }
 
-  #clear() {
-    this.#parentElement.innerHTML = '';
-  }
-
   #timerBlinkAnimation() {
     gsap.fromTo(
       this.#timerElement,
@@ -84,12 +83,6 @@ export default class PlayerView {
         duration: 0.5,
       }
     );
-  }
-
-  render() {
-    this.#clear();
-    this.#markUp = this.#generateMarkUp();
-    this.#parentElement.insertAdjacentHTML('afterbegin', this.#markUp);
   }
 
   async renderScore(score) {
@@ -185,7 +178,7 @@ export default class PlayerView {
   }
 
   slide(data) {
-    gsap.to(this.#parentElement, {
+    gsap.to(this.parentElement, {
       x: `${data}rem`,
       display: 'flex',
       duration: 1,

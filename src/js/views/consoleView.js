@@ -1,14 +1,9 @@
-class ConsoleView {
-  #data;
-  #parentElement = document.querySelector('.console__window');
+import { View } from './View';
 
-  render(data) {
-    this.#clear();
-    this.#parentElement.insertAdjacentHTML('afterbegin', data);
-  }
-
-  #clear() {
-    this.#parentElement.innerHTML = '';
+class ConsoleView extends View {
+  constructor() {
+    super();
+    this.parentElement = document.querySelector('.console__window');
   }
 
   addHandlerRender(handler) {
@@ -16,7 +11,7 @@ class ConsoleView {
   }
 
   slideOut() {
-    gsap.to(this.#parentElement, {
+    gsap.to(this.parentElement, {
       y: '-80rem',
       display: 'none',
       duration: 1,
@@ -24,7 +19,7 @@ class ConsoleView {
   }
 
   slideIn() {
-    gsap.to(this.#parentElement, {
+    gsap.to(this.parentElement, {
       y: '0rem',
       display: 'flex',
       ease: 'circ',

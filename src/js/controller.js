@@ -1,15 +1,17 @@
 import 'core-js/stable';
 import 'regenerator-runtime';
 
-import consoleView from './views/consoleView';
 import flagIcons from './flagIcons';
 import { wait } from './helpers';
 import * as animations from './animations';
 import gameTitle from './gameTitle';
 import menuItems from './menuItems';
 import { menuItemsAnim } from './animations';
+
 import Player from './Player';
+import consoleView from './views/ConsoleView';
 import PlayerView from './views/PlayerView';
+import countryView from './views/CountryView';
 import { state } from './model';
 
 import flagFilled from 'url:/assets/icons/flag-filled.png';
