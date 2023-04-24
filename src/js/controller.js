@@ -12,7 +12,7 @@ import Player from './Player';
 import consoleView from './views/ConsoleView';
 import PlayerView from './views/PlayerView';
 import countryView from './views/CountryView';
-import { state } from './model';
+import * as model from './model';
 
 import flagFilled from 'url:/assets/icons/flag-filled.png';
 import flagRed from 'url:/assets/icons/flag-red.png';
@@ -28,9 +28,6 @@ const player2 = new Player(1, 180, 5);
 const player1View = new PlayerView(0);
 const player2View = new PlayerView(1);
 const playerViews = [player1View, player2View];
-
-const sections = document.querySelectorAll('.section');
-const playerName = document.querySelectorAll('.score__player');
 
 // single player boolean variable
 let singlePlayer;
@@ -66,10 +63,6 @@ const turnsLeft = [];
 
 // timers [player1, player2] 180 seconds for each
 const timers = [];
-
-const renderError = function (err) {
-  countryView.renderFlag(err);
-};
 
 // assingns singlePlayer's value boolean value depending wich option was checked
 const numberOfPlayers = function () {
@@ -146,40 +139,6 @@ const timer = function () {
   }
 };
 
-// 1. PUT A LIST WITH ALL COUNTRIES IN EACH PLAYER'S FIELD
-const renderCountriesList = async function () {
-  try {
-    // getting countries list from Rest Countries API
-    const res = await fetch('https://restcountries.com/v3.1/all'); // try: https://restcountries.com/v3.1/all?fields=name
-
-    // transforming to JSON
-    const countriesList = await res.json();
-
-    if (!res.ok) throw new Error(countriesList);
-
-    // extracting array with country names and cca2 [countryName, cca2]
-    countryNames = countriesList.map(country => [
-      country.name.common,
-      country.cca2,
-    ]);
-
-    // sorting country list
-    countryNames.sort();
-
-    // emptying container
-    playerViews.forEach(view => view.clearCountriesList());
-
-    // rendering list with country names
-    countryNames.forEach(country => {
-      // insert in each players list container
-      playerViews.forEach(view => view.renderCountry(country));
-    });
-  } catch (err) {
-    renderError(err);
-    console.error(`💣💣💣 Something went wrong:${err}`);
-  }
-};
-
 // 2. DISPLAYS A RANDOM COUNTRY'S FLAG AND SAVES COUNTRY'S DATA FOR LATER USE
 const renderCountryData = async function () {
   try {
@@ -193,10 +152,10 @@ const renderCountryData = async function () {
     countryView.renderName(points);
 
     // selectting a random country name
-    const rnd = Math.trunc(Math.random() * countryNames.length);
+    const rnd = Math.trunc(Math.random() * model.state.countriesList.length);
 
     // deleting it from the array to not select it again in the same game
-    country = countryNames.splice(rnd, 1)[0];
+    country = model.state.countriesList.splice(rnd, 1)[0];
 
     // fetching data about country from API
     const data = await fetch(
@@ -248,6 +207,7 @@ const renderCountryData = async function () {
       ],
     ];
   } catch (err) {
+    countryView.render(`💣💣💣 Something went wrong:${err}`);
     console.error(`💣💣💣 Error :${err.message}`);
   }
 };
@@ -379,10 +339,6 @@ const flagSource = function (player) {
 
 // end game modal with message, animation, options
 const endGame = async function () {
-  // checking and assigning winner
-  const winner =
-    score[0] > score[1] ? playerName[0].textContent : playerName[1].textContent;
-
   // deactivate both players
   playerViews[0].deactivatePlayer();
   playerViews[1].deactivatePlayer();
@@ -396,9 +352,6 @@ const endGame = async function () {
 
   // slide in modal window
   consoleView.slideIn();
-
-  // display winner
-  // await renderOutcomeMessage(`WINNER: ${winner}`, 5);
 };
 
 // ----------> ANIMATIONS --------
@@ -443,18 +396,19 @@ const startNew = async function () {
   await initAnim();
 
   // save players to state
-  state.addPlayer(player1);
-  state.addPlayer(player2);
+  model.state.addPlayer(player1);
+  model.state.addPlayer(player2);
 
   initData();
 
-  await renderCountriesList();
+  await model.loadCountriesList();
+  player1View.renderCountriesList(model.state.countriesList);
+  player2View.renderCountriesList(model.state.countriesList);
+
   await renderCountryData();
 
   playerViews.forEach(view => view.addHandlerGuess(submit));
   playerViews.forEach(view => view.addHandlerHelp(renderFact));
-  // btnsHelp.forEach(btn => btn.addEventListener('click', renderFact));
-  // btnsGuess.forEach(btn => btn.addEventListener('click', submit));
 };
 
 // ----------> INIT ---------------

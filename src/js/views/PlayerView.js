@@ -94,6 +94,16 @@ export default class PlayerView extends View {
     );
   }
 
+  #clearCountriesList() {
+    this.#countriesListElement.textContent = '';
+  }
+
+  #renderCountry(data) {
+    const markUp = `<option value="${data[0]}">${data[0]}</option>`;
+
+    this.#countriesListElement.insertAdjacentHTML('beforeend', markUp);
+  }
+
   addHandlerGuess(handler) {
     this.#btnGuess.addEventListener('click', handler);
   }
@@ -153,10 +163,15 @@ export default class PlayerView extends View {
     this.#flagsElement.insertAdjacentHTML('beforeend', markUp);
   }
 
-  renderCountry(data) {
-    const markUp = `<option value="${data[0]}">${data[0]}</option>`;
+  renderCountriesList(list) {
+    // emptying container
+    this.#clearCountriesList();
 
-    this.#countriesListElement.insertAdjacentHTML('beforeend', markUp);
+    // rendering list with country names
+    list.forEach(country => {
+      // insert in each players list container
+      this.#renderCountry(country);
+    });
   }
 
   clearFlags() {
@@ -165,10 +180,6 @@ export default class PlayerView extends View {
 
   clearTimer() {
     this.#timerElement.textContent = '';
-  }
-
-  clearCountriesList() {
-    this.#countriesListElement.textContent = '';
   }
 
   getCountry() {
