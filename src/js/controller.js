@@ -17,6 +17,7 @@ import * as model from './model';
 import flagFilled from 'url:/assets/icons/flag-filled.png';
 import flagRed from 'url:/assets/icons/flag-red.png';
 import flagEmpty from 'url:/assets/icons/flag-empty.png';
+import { async } from 'regenerator-runtime';
 
 gsap.registerPlugin(MotionPathPlugin);
 
@@ -72,36 +73,49 @@ const numberOfPlayers = function () {
 };
 
 // New game initial conditions (score, turns left, timers, guessValues)
-const initData = function () {
-  const timersContainer = document.querySelectorAll('.timer');
+const initData = async function () {
+  try {
+    // setting player1 as active
+    activePlayer = 0;
 
-  // setting player1 as active
-  activePlayer = 0;
+    playerViews[activePlayer].activatePlayer();
 
-  playerViews[activePlayer].activatePlayer();
+    // start timer for active player
+    intervalID = setInterval(timer, 1000, activePlayer);
 
-  // start timer for active player
-  intervalID = setInterval(timer, 1000, activePlayer);
+    // setting score for each player
+    score[0] = score[1] = 0;
 
-  // setting score for each player
-  score[0] = score[1] = 0;
+    // setting turns left for each player
+    turnsLeft[0] =
+      turnsLeft[1] =
+      turns =
+        document.querySelector('input[name="flags"]:checked').value;
 
-  // setting turns left for each player
-  turnsLeft[0] =
-    turnsLeft[1] =
-    turns =
-      document.querySelector('input[name="flags"]:checked').value;
+    // displaying turns left for each player
+    playerViews[0].renderFlags(flagSource(0));
+    playerViews[1].renderFlags(flagSource(1));
 
-  // displaying turns left for each player
-  playerViews[0].renderFlags(flagSource(0));
-  playerViews[1].renderFlags(flagSource(1));
+    //   setting timers for each player
+    timers[0] = timers[1] =
+      document.querySelector('input[name="time"]:checked').value * 60;
 
-  //   setting timers for each player
-  timers[0] = timers[1] =
-    document.querySelector('input[name="time"]:checked').value * 60;
+    // reseting guessValues
+    guessValues[0].length = guessValues[1].length = 0;
 
-  // reseting guessValues
-  guessValues[0].length = guessValues[1].length = 0;
+    // save players to state
+    model.state.addPlayer(player1);
+    model.state.addPlayer(player2);
+
+    await model.loadCountriesList();
+    player1View.renderCountriesList(model.state.countriesList);
+    player2View.renderCountriesList(model.state.countriesList);
+
+    await controlCountryData();
+  } catch (err) {
+    countryView.render(`💣💣💣 Something went wrong:${err}`);
+    console.error(err);
+  }
 };
 
 // updates active player's timer decreasing it every second
@@ -140,7 +154,7 @@ const timer = function () {
 };
 
 // 2. DISPLAYS A RANDOM COUNTRY'S FLAG AND SAVES COUNTRY'S DATA FOR LATER USE
-const renderCountryData = async function () {
+const controlCountryData = async function () {
   try {
     // - empty country data container
     countryView.clearFacts();
@@ -224,10 +238,8 @@ const renderFact = function () {
   // render fact
   countryView.renderFact(fact);
 
-  // if facts array is empty hide help button
-  if (!countryInfo[0]) {
-    this.style.display = 'none';
-  }
+  // if countryInfo array is empty hide help button
+  if (countryInfo.length === 0) playerViews[activePlayer].hideBtnHelp();
 
   // - decrease points
   points -= 3;
@@ -300,7 +312,7 @@ const submit = async function () {
   }
 
   // - render new countrie
-  await renderCountryData();
+  await controllCountryData();
 
   // switch active player only if other player has time left (timer bigger than 0)
   if (!singlePlayer && timers[activePlayer === 0 ? 1 : 0] > 0) switchPlayer();
@@ -394,18 +406,7 @@ const initAnim = async function () {
 const startNew = async function () {
   numberOfPlayers();
   await initAnim();
-
-  // save players to state
-  model.state.addPlayer(player1);
-  model.state.addPlayer(player2);
-
-  initData();
-
-  await model.loadCountriesList();
-  player1View.renderCountriesList(model.state.countriesList);
-  player2View.renderCountriesList(model.state.countriesList);
-
-  await renderCountryData();
+  await initData();
 
   playerViews.forEach(view => view.addHandlerGuess(submit));
   playerViews.forEach(view => view.addHandlerHelp(renderFact));
@@ -413,7 +414,7 @@ const startNew = async function () {
 
 // ----------> INIT ---------------
 (async function () {
-  await wait(0.5);
+  // await wait(0.5);
 
   await loadAnimation();
 
