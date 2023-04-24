@@ -33,14 +33,8 @@ const playerViews = [player1View, player2View];
 // single player boolean variable
 let singlePlayer;
 
-// array with a list of countries to display
-let countryNames;
-
 // country to guess
 let country;
-
-// info about the country to display
-let countryInfo;
 
 // points to win
 let points = 21;
@@ -171,55 +165,11 @@ const controlCountryData = async function () {
     // deleting it from the array to not select it again in the same game
     country = model.state.countriesList.splice(rnd, 1)[0];
 
-    // fetching data about country from API
-    const data = await fetch(
-      `https://restcountries.com/v3.1/alpha/${country[1]}`
-    );
+    await model.loadCountry(country);
 
-    // throw error if data not ok
-    if (!data.ok) throw new Error(`💣💣💣 Can't fetch country data from API`);
-
-    // transform data to json
-    const countryData = await data.json();
-
-    // rendering flag
-    countryView.renderFlag(countryData[0].flags.png);
+    countryView.renderFlag(model.state.country.flag);
 
     //   creating CountryInfo array with name, capital, population, continent, language, currencies, borderCountry
-    countryInfo = [
-      [
-        'Capital',
-        countryData[0].capital ? countryData[0].capital[0] : 'no info',
-      ],
-
-      [
-        'Population',
-        `${(countryData[0].population / 1000000).toFixed(1)} million people`,
-      ],
-
-      ['Continent', countryData[0].region],
-
-      [
-        'Languages',
-        countryData[0].languages
-          ? Object.values(countryData[0].languages)
-          : 'no info',
-      ],
-
-      [
-        'Currency',
-        countryData[0].currencies
-          ? Object.values(countryData[0].currencies)[0].name
-          : 'no info',
-      ],
-
-      [
-        'Neighbours',
-        countryData[0].borders
-          ? countryData[0].borders
-          : 'islands, no neighbours',
-      ],
-    ];
   } catch (err) {
     countryView.render(`💣💣💣 Something went wrong:${err}`);
     console.error(`💣💣💣 Error :${err.message}`);
@@ -230,8 +180,8 @@ const controlCountryData = async function () {
 // displays a random fact about the country
 const renderFact = function () {
   // choosing random fact from countryInfo object with splice
-  const fact = countryInfo.splice(
-    Math.trunc(Math.random() * Object.entries(countryInfo).length),
+  const fact = model.state.country.facts.splice(
+    Math.trunc(Math.random() * model.state.country.facts.length),
     1
   )[0];
 
@@ -239,7 +189,8 @@ const renderFact = function () {
   countryView.renderFact(fact);
 
   // if countryInfo array is empty hide help button
-  if (countryInfo.length === 0) playerViews[activePlayer].hideBtnHelp();
+  if (model.state.country.facts.length === 0)
+    playerViews[activePlayer].hideBtnHelp();
 
   // - decrease points
   points -= 3;
@@ -312,7 +263,7 @@ const submit = async function () {
   }
 
   // - render new countrie
-  await controllCountryData();
+  await controlCountryData();
 
   // switch active player only if other player has time left (timer bigger than 0)
   if (!singlePlayer && timers[activePlayer === 0 ? 1 : 0] > 0) switchPlayer();
