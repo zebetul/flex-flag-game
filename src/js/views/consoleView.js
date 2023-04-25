@@ -26,5 +26,25 @@ class ConsoleView extends View {
       duration: 1,
     });
   }
+
+  readGameSettings() {
+    // getting players number
+    const plNrNodeList = document.getElementsByName('drone');
+    const numberOfPlayers = +Array.from(plNrNodeList).find(
+      element => element.checked
+    ).value;
+
+    // getting minutes
+    const timeNodeList = document.getElementsByName('time');
+    const time = +Array.from(timeNodeList).find(element => element.checked)
+      .value;
+
+    // getting flags
+    const turnsNodeList = document.getElementsByName('flags');
+    const turns = +Array.from(turnsNodeList).find(element => element.checked)
+      .value;
+
+    return { numberOfPlayers: numberOfPlayers, time: time * 60, turns: turns };
+  }
 }
 export default new ConsoleView();

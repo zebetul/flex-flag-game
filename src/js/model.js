@@ -1,6 +1,12 @@
 import { AJAX } from './helpers';
 
 export const state = {
+  numberOfPlayers: 0,
+  time: 0,
+  turns: 0,
+  activePlayer: 0,
+  singlePlayer: false,
+  points: 21,
   countriesList: [],
   players: [],
   country: {},
@@ -9,8 +15,32 @@ export const state = {
     this.players.push(player);
   },
 
-  getPlayer(playerIndex) {
-    return this.players[playerIndex];
+  player(number) {
+    return this.players.find(player => player.number === number);
+  },
+
+  saveSettings(settings) {
+    this.numberOfPlayers = settings.numberOfPlayers;
+    this.time = settings.time;
+    this.turns = settings.turns;
+
+    if (this.numberOfPlayers === 1) this.singlePlayer = true;
+  },
+
+  activePlayer() {
+    return this.players.find(player => player.active);
+  },
+
+  restingPlayer() {
+    return this.players.find(player => player.active === false);
+  },
+
+  switchActivePlayer() {
+    this.players.forEach(player => (player.active = !player.active));
+  },
+
+  resetGuessValues() {
+    this.players.forEach(player => (player.guessValues = []));
   },
 };
 

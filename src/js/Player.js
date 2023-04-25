@@ -1,17 +1,19 @@
 export default class Player {
-  #score = 0;
+  guessValues = [];
+  score = 0;
 
-  constructor(number, timer, turnsLeft) {
+  constructor(number, timeLeft, turnsLeft, active) {
     this.number = number;
-    this.timer = timer;
+    this.timeLeft = timeLeft;
     this.turnsLeft = turnsLeft;
+    this.active = active;
   }
 
   setScore(score) {
-    this.#score = score;
+    this.score = score;
   }
 
   getScore() {
-    return this.#score;
+    return this.score;
   }
 }

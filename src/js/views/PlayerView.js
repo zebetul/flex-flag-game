@@ -215,18 +215,22 @@ export default class PlayerView extends View {
   }
 
   // adds active player class and displays buttons
-  activatePlayer() {
+  activateView() {
     this.parentElement.classList.add('player--active');
     gsap.set([this.#btnHelp, this.#btnGuess], { display: 'block' });
   }
 
   // adds active player class and removes buttons
-  deactivatePlayer() {
+  deactivateView() {
     this.parentElement.classList.remove('player--active');
     gsap.set([this.#btnHelp, this.#btnGuess], { display: 'none' });
   }
 
   hideBtnHelp() {
     this.#btnHelp.style.display = 'none';
+  }
+
+  hideBtnGuess() {
+    this.#btnGuess.style.display = 'none';
   }
 }

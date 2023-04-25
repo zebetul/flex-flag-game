@@ -17,93 +17,44 @@ import * as model from './model';
 import flagFilled from 'url:/assets/icons/flag-filled.png';
 import flagRed from 'url:/assets/icons/flag-red.png';
 import flagEmpty from 'url:/assets/icons/flag-empty.png';
-import { async } from 'regenerator-runtime';
 
 gsap.registerPlugin(MotionPathPlugin);
-
-// instantiate players from Player class
-const player1 = new Player(0, 300, 10);
-const player2 = new Player(1, 180, 5);
 
 // instantiate playerViews, one for each player
 const player1View = new PlayerView(0);
 const player2View = new PlayerView(1);
 const playerViews = [player1View, player2View];
 
-// single player boolean variable
-let singlePlayer;
-
-// country to guess
-let country;
-
-// points to win
-let points = 21;
-
-// setting 0 or 1 as player indexes(player1 = 0, player2 = 1) and switching between them as active player
-let activePlayer = 0;
-
 let intervalID;
-
-let turns;
-
-// array containing two arrays, one for each player, wich contains a boolean value for each turns played that represents the outcome
-// true = country guessed; false = not guessed
-const guessValues = [[], []];
-
-// score [player1, player2]
-const score = [];
-
-// turns left [player1, player2]
-const turnsLeft = [];
-
-// timers [player1, player2] 180 seconds for each
-const timers = [];
-
-// assingns singlePlayer's value boolean value depending wich option was checked
-const numberOfPlayers = function () {
-  // setting sinlePlayer boolen value
-  if (document.querySelector('.player__1').checked) singlePlayer = true;
-  if (document.querySelector('.player__2').checked) singlePlayer = false;
-};
 
 // New game initial conditions (score, turns left, timers, guessValues)
 const initData = async function () {
   try {
-    // setting player1 as active
-    activePlayer = 0;
+    // instantiate players from Player class
 
-    playerViews[activePlayer].activatePlayer();
-
-    // start timer for active player
-    intervalID = setInterval(timer, 1000, activePlayer);
-
-    // setting score for each player
-    score[0] = score[1] = 0;
-
-    // setting turns left for each player
-    turnsLeft[0] =
-      turnsLeft[1] =
-      turns =
-        document.querySelector('input[name="flags"]:checked').value;
+    // save players to state
+    model.state.addPlayer(
+      new Player(0, model.state.time, model.state.turns, true)
+    );
+    model.state.addPlayer(
+      new Player(1, model.state.time, model.state.turns, false)
+    );
 
     // displaying turns left for each player
     playerViews[0].renderFlags(flagSource(0));
     playerViews[1].renderFlags(flagSource(1));
 
-    //   setting timers for each player
-    timers[0] = timers[1] =
-      document.querySelector('input[name="time"]:checked').value * 60;
-
-    // reseting guessValues
-    guessValues[0].length = guessValues[1].length = 0;
-
-    // save players to state
-    model.state.addPlayer(player1);
-    model.state.addPlayer(player2);
-
     await model.loadCountriesList();
     player1View.renderCountriesList(model.state.countriesList);
     player2View.renderCountriesList(model.state.countriesList);
+
+    playerViews[model.state.activePlayer().number].activateView();
+
+    // start timer for active player
+    intervalID = setInterval(timer, 1000, model.state.activePlayer().number);
+
+    // reseting guessValues
+    model.state.resetGuessValues();
 
     await controlCountryData();
   } catch (err) {
@@ -115,33 +66,39 @@ const initData = async function () {
 // updates active player's timer decreasing it every second
 const timer = function () {
   // decrease timer for active player
-  timers[activePlayer] -= 1;
+  model.state.activePlayer().timeLeft -= 1;
 
-  playerViews[activePlayer].renderTimer(timers[activePlayer]);
+  playerViews[model.state.activePlayer().number].renderTimer(
+    model.state.activePlayer().timeLeft
+  );
 
   // ----------> TIME IS UP END GAME SCENARIOS
   // if there are two players and active player's timer falls bellow 0 than change player
-  if (!singlePlayer && timers[activePlayer] === 0) {
+  if (!model.state.singlePlayer && model.state.activePlayer().timeLeft === 0) {
     // delete timer
     clearInterval(intervalID);
 
     // setting single player true for the rest of the game
-    singlePlayer = true;
+    model.state.singlePlayer = true;
 
-    playerViews[activePlayer].deactivatePlayer();
+    playerViews[model.state.activePlayer().number].deactivateView();
 
     switchPlayer();
   }
 
   // if single player and timer is up end game
-  if (singlePlayer && timers[activePlayer] === 0) {
+  if (model.state.singlePlayer && model.state.activePlayer().timeLeft === 0) {
     clearInterval(intervalID);
     endGame();
     return;
   }
 
-  // if both timers are up than end game
-  if (!singlePlayer && timers[0] === 0 && timers[1] === 0) {
+  // if double player and both timers are up than end game
+  if (
+    !model.state.singlePlayer &&
+    model.state.player(0).timeLeft === 0 &&
+    model.state.player(1).timeLeft === 0
+  ) {
     endGame();
     return;
   }
@@ -154,22 +111,20 @@ const controlCountryData = async function () {
     countryView.clearFacts();
 
     // - reseting points
-    points = 21;
+    model.state.points = 21;
 
     // - hide country name and display points
-    countryView.renderName(points);
+    countryView.renderName(model.state.points);
 
     // selectting a random country name
     const rnd = Math.trunc(Math.random() * model.state.countriesList.length);
 
     // deleting it from the array to not select it again in the same game
-    country = model.state.countriesList.splice(rnd, 1)[0];
+    const country = model.state.countriesList.splice(rnd, 1)[0];
 
     await model.loadCountry(country);
 
     countryView.renderFlag(model.state.country.flag);
-
-    //   creating CountryInfo array with name, capital, population, continent, language, currencies, borderCountry
   } catch (err) {
     countryView.render(`💣💣💣 Something went wrong:${err}`);
     console.error(`💣💣💣 Error :${err.message}`);
@@ -190,73 +145,77 @@ const renderFact = function () {
 
   // if countryInfo array is empty hide help button
   if (model.state.country.facts.length === 0)
-    playerViews[activePlayer].hideBtnHelp();
+    playerViews[model.state.activePlayer().number].hideBtnHelp();
 
   // - decrease points
-  points -= 3;
-  countryView.renderName(points);
-};
-
-// reset conditions on turn end
-const resetConditions = function () {
-  // hiding buttons for active player
-  gsap.set(`.btn__${activePlayer}`, { display: 'none' });
-
-  // update the number of turns remaining for the current player
-  turnsLeft[activePlayer] -= 1;
+  model.state.points -= 3;
+  countryView.renderName(model.state.points);
 };
 
 // display outcome and ads points to score if guess correct
 const guessOutcome = async function () {
-  if (country[0] === playerViews[activePlayer].getCountry()) {
+  if (
+    model.state.country.name ===
+    playerViews[model.state.activePlayer().number].getCountry()
+  ) {
     // add quess outcome boolean element to guessOutcome array for active player
-    guessValues[activePlayer].push(true);
+    model.state.activePlayer().guessValues.push(true);
+    model.state.activePlayer().score += model.state.points;
 
     // - display congrats message
-    await playerViews[activePlayer].renderScore(5);
+    await playerViews[model.state.activePlayer().number].renderScore(
+      model.state.activePlayer().score
+    );
   } else {
-    playerViews[activePlayer].renderMissedAnimation();
+    playerViews[model.state.activePlayer().number].renderMissedAnimation();
 
-    guessValues[activePlayer].push(false);
+    model.state.activePlayer().guessValues.push(false);
   }
 };
 
 // 4. BUTTON GUESS EVENT HANDLER - END TURN ACTIONS
 // submits the choice made by player
 const submit = async function () {
-  // reseting initial conditions in preparation for switching players
-  resetConditions();
+  // hiding buttons for active player
+  playerViews[model.state.activePlayer().number].hideBtnGuess();
+  playerViews[model.state.activePlayer().number].hideBtnHelp();
+
+  // update the number of turns remaining for the current player
+  model.state.activePlayer().turnsLeft -= 1;
 
   // - display country name
-  countryView.renderName(country[0]);
+  countryView.renderName(model.state.country.name);
 
   // - display outcome message if guess correct => victory else fail
   guessOutcome();
 
   // display remaining turns for current player
-  playerViews[activePlayer].renderFlags(flagSource(activePlayer));
+  playerViews[model.state.activePlayer().number].renderFlags(
+    flagSource(model.state.activePlayer().number)
+  );
 
   await wait(2);
 
-  if (!singlePlayer) {
-    playerViews[activePlayer].deactivatePlayer();
+  if (!model.state.singlePlayer) {
+    playerViews[model.state.activePlayer().number].deactivateView();
 
     // stop current player's timer
     clearInterval(intervalID);
   }
 
   // if single player at end turn, show buttons
-  if (singlePlayer) playerViews[activePlayer].activatePlayer();
+  if (model.state.singlePlayer)
+    playerViews[model.state.activePlayer().number].activateView();
 
   // ---------->  NO TURNS LEFT END GAME SCENARIOS
   // if there are no turns left then end the game
-  if (turnsLeft[1] === 0) {
+  if (model.state.player(1).turnsLeft === 0) {
     clearInterval(intervalID);
     await endGame();
     return;
   }
   // single player end game condition: no turns left
-  if (singlePlayer && turnsLeft[0] === 0) {
+  if (model.state.singlePlayer && model.state.player(0).turnsLeft === 0) {
     clearInterval(intervalID);
     await endGame();
     return;
@@ -265,19 +224,21 @@ const submit = async function () {
   // - render new countrie
   await controlCountryData();
 
-  // switch active player only if other player has time left (timer bigger than 0)
-  if (!singlePlayer && timers[activePlayer === 0 ? 1 : 0] > 0) switchPlayer();
+  // switch active player only if other player has time left
+  if (!model.state.singlePlayer && model.state.restingPlayer().timeLeft > 0)
+    switchPlayer();
 };
 
 // switch player and reset new active player's initial conditions for the new turn
 const switchPlayer = function () {
-  // - switching active player
-  activePlayer ? (activePlayer = 0) : (activePlayer = 1);
+  // - switching active player in state
+  model.state.switchActivePlayer();
 
-  playerViews[activePlayer].activatePlayer();
+  // activate player view
+  playerViews[model.state.activePlayer().number].activateView();
 
   // start timer for new active player
-  intervalID = setInterval(timer, 1000, activePlayer);
+  intervalID = setInterval(timer, 1000, model.state.activePlayer().number);
 };
 
 // flags graphic: displays a filled flag for every remaining turn(red or blue depending on turns outcome) and an empty one for the rest
@@ -285,11 +246,17 @@ const switchPlayer = function () {
 const flagSource = function (player) {
   const sources = [];
 
-  for (let i = 1; i <= turns; i++) {
+  for (let i = 1; i <= model.state.turns; i++) {
     let src = flagEmpty;
-    if (turns - turnsLeft[player] >= i && guessValues[activePlayer][i - 1])
+    if (
+      model.state.turns - model.state.player(player).turnsLeft >= i &&
+      model.state.activePlayer().guessValues[i - 1]
+    )
       src = flagFilled;
-    if (turns - turnsLeft[player] >= i && !guessValues[activePlayer][i - 1])
+    if (
+      model.state.turns - model.state.player(player).turnsLeft >= i &&
+      !model.state.activePlayer().guessValues[i - 1]
+    )
       src = flagRed;
 
     sources.push(src);
@@ -298,22 +265,15 @@ const flagSource = function (player) {
   return sources;
 };
 
-// playerViews[activePlayer].renderFlags(flagSource());
-
 // end game modal with message, animation, options
 const endGame = async function () {
-  // deactivate both players
-  playerViews[0].deactivatePlayer();
-  playerViews[1].deactivatePlayer();
-
-  // clearing turns left and timers and reseting timers color back to blue
   playerViews.forEach(view => {
+    view.deactivateView();
     view.clearFlags();
     view.clearTimer();
     view.resetTimerColour();
   });
 
-  // slide in modal window
   consoleView.slideIn();
 };
 
@@ -332,20 +292,20 @@ const loadAnimation = async function () {
 
   // await wait(1.7);
 
-  animations.menuItemsAnim();
+  await animations.menuItemsAnim();
 };
 
 // start new game animation(modal window and player section sliders in/out)
 const initAnim = async function () {
   // when a two player game ended and next game will be single player -> slide back player 2
-  if (singlePlayer && gsap.getProperty('.section__1', 'x') === 22)
+  if (model.state.singlePlayer && gsap.getProperty('.section__1', 'x') === 22)
     player2View.slide(-22);
 
   // animate first player's section
   player1View.slide(-57);
 
   // if double player than animate other player's section
-  if (!singlePlayer) player2View.slide(22);
+  if (!model.state.singlePlayer) player2View.slide(22);
 
   await wait(1);
 
@@ -355,8 +315,10 @@ const initAnim = async function () {
 
 // ----------> START NEW GAME -------------------------------
 const startNew = async function () {
-  numberOfPlayers();
+  model.state.saveSettings(consoleView.readGameSettings());
+
   await initAnim();
+
   await initData();
 
   playerViews.forEach(view => view.addHandlerGuess(submit));
