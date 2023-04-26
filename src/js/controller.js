@@ -78,8 +78,6 @@ const timer = function () {
     // setting single player true for the rest of the game
     model.state.singlePlayer = true;
 
-    activePlayerView().setInactive();
-
     switchPlayer();
   }
 
@@ -131,6 +129,8 @@ const controlCountryData = async function () {
 // 3. BUTTON HELP EVENT HANDLER
 // displays a random fact about the country
 const renderFact = function () {
+  if (model.state.country.facts.length === 0) return;
+
   // choosing random fact from countryInfo object with splice
   const fact = model.state.country.facts.splice(
     Math.trunc(Math.random() * model.state.country.facts.length),
@@ -141,7 +141,6 @@ const renderFact = function () {
   countryView.renderFact(fact);
 
   // if countryInfo array is empty hide help button
-  if (model.state.country.facts.length === 0) activePlayerView().hideBtnHelp();
 
   // - decrease points
   model.state.points -= 3;
@@ -176,13 +175,6 @@ const submit = async function () {
 
   await wait(2);
 
-  if (!model.state.singlePlayer) {
-    activePlayerView().setInactive();
-
-    // stop current player's timer
-    clearInterval(intervalID);
-  }
-
   // ---------->  NO TURNS LEFT END GAME SCENARIOS
   if (model.state.singlePlayer) {
     if (model.state.player(0).turnsLeft === 0) {
@@ -202,15 +194,21 @@ const submit = async function () {
       await endGame();
       return;
     } else {
+      // stop current player's timer
+      clearInterval(intervalID);
+
+      switchPlayer();
+
       // - render new countrie
       await controlCountryData();
-      switchPlayer();
     }
   }
 };
 
 // switch player and reset new active player's initial conditions for the new turn
 const switchPlayer = function () {
+  activePlayerView().setInactive();
+
   // - switching active player in state
   model.state.switchActivePlayer();
 

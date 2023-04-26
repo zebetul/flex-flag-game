@@ -55,7 +55,6 @@ export default class PlayerView extends View {
       `.btn__guess__${this.#playerNumber}`
     );
   }
-
   #generateMarkUp() {
     return `
     <div class="timer__container">
@@ -86,7 +85,6 @@ export default class PlayerView extends View {
     <button class="btn btn__help btn__help__${this.#playerNumber}">Help</button>
     `;
   }
-
   #timerBlinkAnimation() {
     gsap.fromTo(
       this.#timerElement,
@@ -100,25 +98,20 @@ export default class PlayerView extends View {
       }
     );
   }
-
   #clearCountriesList() {
     this.#countriesListElement.textContent = '';
   }
-
   #renderCountry(data) {
     const markUp = `<option value="${data[0]}">${data[0]}</option>`;
 
     this.#countriesListElement.insertAdjacentHTML('beforeend', markUp);
   }
-
   addHandlerGuess(handler) {
     this.#btnGuess.addEventListener('click', handler);
   }
-
   addHandlerHelp(handler) {
     this.#btnHelp.addEventListener('click', handler);
   }
-
   async renderScore(score) {
     // outcome positive(true): highlight country in countries list
     gsap.to(this.#countriesListElement, {
@@ -151,7 +144,6 @@ export default class PlayerView extends View {
       await wait(1 / points);
     }
   }
-
   renderTimer(seconds) {
     // formating the time left in m:ss and displaying it
     this.#timerElement.textContent = formatTimer(seconds);
@@ -159,9 +151,13 @@ export default class PlayerView extends View {
     // if less than 20 seconds left then timer blinks red
     if (seconds < TIME_WARNING) this.#timerBlinkAnimation();
   }
-
-  // flags graphic: displays a filled flag for every remaining turn(red or blue depending on turns outcome) and an empty one for the rest
-  // function that returns flag icon source depending on guess outcome
+  /**
+   * returns an array with flagNumber elements each element is a flag icon source representing player's turns
+   * @param {Player} player
+   * @param {Number} flagNumber number of flags icons to be displayed
+   * @returns {Array} an array with flag icon png sources
+   * @author Cristi Sebeni
+   */
   #flagSource(player, flagNumber) {
     const sources = [];
 
@@ -179,7 +175,6 @@ export default class PlayerView extends View {
 
     return sources;
   }
-
   renderFlags(player, flagNumber) {
     this.clearFlags();
 
@@ -191,7 +186,6 @@ export default class PlayerView extends View {
 
     this.#flagsElement.insertAdjacentHTML('beforeend', markUp);
   }
-
   renderCountriesList(list) {
     // emptying container
     this.#clearCountriesList();
@@ -202,25 +196,20 @@ export default class PlayerView extends View {
       this.#renderCountry(country);
     });
   }
-
   clearFlags() {
     this.#flagsElement.textContent = '';
   }
-
   clearTimer() {
     this.#timerElement.textContent = '';
   }
-
   getCountry() {
     return this.#countriesListElement.value;
   }
-
   resetTimerColour() {
     gsap.set(this.#timerElement, {
       color: 'rgb(0, 140, 255)',
     });
   }
-
   renderMissedAnimation() {
     gsap.to(this.#countriesListElement, {
       backgroundColor: 'red',
@@ -233,7 +222,6 @@ export default class PlayerView extends View {
       duration: 1,
     });
   }
-
   slide(data) {
     gsap.to(this.parentElement, {
       x: `${data}rem`,
@@ -242,24 +230,12 @@ export default class PlayerView extends View {
       ease: 'circ',
     });
   }
-
-  // adds active player class and displays buttons
   setActive() {
     this.parentElement.classList.add('player--active');
     this.#active = true;
   }
-
-  // adds active player class and removes buttons
   setInactive() {
     this.parentElement.classList.remove('player--active');
     this.#active = false;
-  }
-
-  hideBtnHelp() {
-    this.#btnHelp.style.display = 'none';
-  }
-
-  hideBtnGuess() {
-    this.#btnGuess.style.display = 'none';
   }
 }
