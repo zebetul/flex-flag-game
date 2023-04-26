@@ -2,8 +2,13 @@ import { wait, formatTimer } from '../helpers';
 import { TIME_WARNING } from '../config';
 import { View } from './View';
 
+import flagFilled from 'url:/assets/icons/flag-filled.png';
+import flagRed from 'url:/assets/icons/flag-red.png';
+import flagEmpty from 'url:/assets/icons/flag-empty.png';
+
 export default class PlayerView extends View {
   #playerNumber;
+  #active;
   #scoreElement;
   #timerElement;
   #flagsElement;
@@ -13,10 +18,12 @@ export default class PlayerView extends View {
 
   score = 0;
 
-  constructor(playerNumber) {
+  constructor(playerNumber, active) {
     super();
 
     this.#playerNumber = playerNumber;
+
+    this.#active = active;
 
     this.parentElement = document.querySelector(
       `.section__${this.#playerNumber}`
@@ -153,8 +160,30 @@ export default class PlayerView extends View {
     if (seconds < TIME_WARNING) this.#timerBlinkAnimation();
   }
 
-  renderFlags(source) {
+  // flags graphic: displays a filled flag for every remaining turn(red or blue depending on turns outcome) and an empty one for the rest
+  // function that returns flag icon source depending on guess outcome
+  #flagSource(player, flagNumber) {
+    const sources = [];
+
+    for (let i = 1; i <= flagNumber; i++) {
+      let src = flagEmpty;
+
+      if (flagNumber - player.turnsLeft >= i && player.guessValues[i - 1])
+        src = flagFilled;
+
+      if (flagNumber - player.turnsLeft >= i && !player.guessValues[i - 1])
+        src = flagRed;
+
+      sources.push(src);
+    }
+
+    return sources;
+  }
+
+  renderFlags(player, flagNumber) {
     this.clearFlags();
+
+    const source = this.#flagSource(player, flagNumber);
 
     const markUp = source
       .map(src => `<img class="flag__icon" src="${src}" alt="" />`)
@@ -215,15 +244,15 @@ export default class PlayerView extends View {
   }
 
   // adds active player class and displays buttons
-  activateView() {
+  setActive() {
     this.parentElement.classList.add('player--active');
-    gsap.set([this.#btnHelp, this.#btnGuess], { display: 'block' });
+    this.#active = true;
   }
 
   // adds active player class and removes buttons
-  deactivateView() {
+  setInactive() {
     this.parentElement.classList.remove('player--active');
-    gsap.set([this.#btnHelp, this.#btnGuess], { display: 'none' });
+    this.#active = false;
   }
 
   hideBtnHelp() {

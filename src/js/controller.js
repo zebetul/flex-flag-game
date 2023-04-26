@@ -1,31 +1,30 @@
-import 'core-js/stable';
-import 'regenerator-runtime';
-
 import flagIcons from './flagIcons';
+import menuItems from './menuItems';
+import gameTitle from './gameTitle';
 import { wait } from './helpers';
 import * as animations from './animations';
-import gameTitle from './gameTitle';
-import menuItems from './menuItems';
-import { menuItemsAnim } from './animations';
-
 import Player from './Player';
+import * as model from './model';
 import consoleView from './views/ConsoleView';
 import PlayerView from './views/PlayerView';
 import countryView from './views/CountryView';
-import * as model from './model';
 
-import flagFilled from 'url:/assets/icons/flag-filled.png';
-import flagRed from 'url:/assets/icons/flag-red.png';
-import flagEmpty from 'url:/assets/icons/flag-empty.png';
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
+import { async } from 'regenerator-runtime';
 
 gsap.registerPlugin(MotionPathPlugin);
 
 // instantiate playerViews, one for each player
-const player1View = new PlayerView(0);
-const player2View = new PlayerView(1);
+const player1View = new PlayerView(0, true);
+const player2View = new PlayerView(1, false);
 const playerViews = [player1View, player2View];
 
 let intervalID;
+
+const activePlayerView = function () {
+  return playerViews[model.state.activePlayer().number];
+};
 
 // New game initial conditions (score, turns left, timers, guessValues)
 const initData = async function () {
@@ -41,14 +40,14 @@ const initData = async function () {
     );
 
     // displaying turns left for each player
-    playerViews[0].renderFlags(flagSource(0));
-    playerViews[1].renderFlags(flagSource(1));
+    playerViews[0].renderFlags(model.state.player(0), model.state.turns);
+    playerViews[1].renderFlags(model.state.player(1), model.state.turns);
 
     await model.loadCountriesList();
     player1View.renderCountriesList(model.state.countriesList);
     player2View.renderCountriesList(model.state.countriesList);
 
-    playerViews[model.state.activePlayer().number].activateView();
+    activePlayerView().setActive();
 
     // start timer for active player
     intervalID = setInterval(timer, 1000, model.state.activePlayer().number);
@@ -68,9 +67,7 @@ const timer = function () {
   // decrease timer for active player
   model.state.activePlayer().timeLeft -= 1;
 
-  playerViews[model.state.activePlayer().number].renderTimer(
-    model.state.activePlayer().timeLeft
-  );
+  activePlayerView().renderTimer(model.state.activePlayer().timeLeft);
 
   // ----------> TIME IS UP END GAME SCENARIOS
   // if there are two players and active player's timer falls bellow 0 than change player
@@ -81,7 +78,7 @@ const timer = function () {
     // setting single player true for the rest of the game
     model.state.singlePlayer = true;
 
-    playerViews[model.state.activePlayer().number].deactivateView();
+    activePlayerView().setInactive();
 
     switchPlayer();
   }
@@ -119,7 +116,7 @@ const controlCountryData = async function () {
     // selectting a random country name
     const rnd = Math.trunc(Math.random() * model.state.countriesList.length);
 
-    // deleting it from the array to not select it again in the same game
+    // extracting country and deleting it from the array to not select it again in the same game
     const country = model.state.countriesList.splice(rnd, 1)[0];
 
     await model.loadCountry(country);
@@ -144,89 +141,72 @@ const renderFact = function () {
   countryView.renderFact(fact);
 
   // if countryInfo array is empty hide help button
-  if (model.state.country.facts.length === 0)
-    playerViews[model.state.activePlayer().number].hideBtnHelp();
+  if (model.state.country.facts.length === 0) activePlayerView().hideBtnHelp();
 
   // - decrease points
   model.state.points -= 3;
   countryView.renderName(model.state.points);
 };
 
-// display outcome and ads points to score if guess correct
-const guessOutcome = async function () {
-  if (
-    model.state.country.name ===
-    playerViews[model.state.activePlayer().number].getCountry()
-  ) {
-    // add quess outcome boolean element to guessOutcome array for active player
+const controlGuessOutcome = async function () {
+  if (model.state.country.name === activePlayerView().getCountry()) {
+    // add quess outcome boolean value element to guessOutcome array for active player
     model.state.activePlayer().guessValues.push(true);
+
     model.state.activePlayer().score += model.state.points;
 
-    // - display congrats message
-    await playerViews[model.state.activePlayer().number].renderScore(
-      model.state.activePlayer().score
-    );
+    await activePlayerView().renderScore(model.state.activePlayer().score);
   } else {
-    playerViews[model.state.activePlayer().number].renderMissedAnimation();
+    activePlayerView().renderMissedAnimation();
 
     model.state.activePlayer().guessValues.push(false);
   }
 };
 
-// 4. BUTTON GUESS EVENT HANDLER - END TURN ACTIONS
-// submits the choice made by player
 const submit = async function () {
-  // hiding buttons for active player
-  playerViews[model.state.activePlayer().number].hideBtnGuess();
-  playerViews[model.state.activePlayer().number].hideBtnHelp();
+  countryView.renderName(model.state.country.name);
+
+  controlGuessOutcome();
 
   // update the number of turns remaining for the current player
   model.state.activePlayer().turnsLeft -= 1;
 
-  // - display country name
-  countryView.renderName(model.state.country.name);
-
-  // - display outcome message if guess correct => victory else fail
-  guessOutcome();
-
   // display remaining turns for current player
-  playerViews[model.state.activePlayer().number].renderFlags(
-    flagSource(model.state.activePlayer().number)
-  );
+  activePlayerView().renderFlags(model.state.activePlayer(), model.state.turns);
 
   await wait(2);
 
   if (!model.state.singlePlayer) {
-    playerViews[model.state.activePlayer().number].deactivateView();
+    activePlayerView().setInactive();
 
     // stop current player's timer
     clearInterval(intervalID);
   }
 
-  // if single player at end turn, show buttons
-  if (model.state.singlePlayer)
-    playerViews[model.state.activePlayer().number].activateView();
-
   // ---------->  NO TURNS LEFT END GAME SCENARIOS
-  // if there are no turns left then end the game
-  if (model.state.player(1).turnsLeft === 0) {
-    clearInterval(intervalID);
-    await endGame();
-    return;
-  }
-  // single player end game condition: no turns left
-  if (model.state.singlePlayer && model.state.player(0).turnsLeft === 0) {
-    clearInterval(intervalID);
-    await endGame();
-    return;
+  if (model.state.singlePlayer) {
+    if (model.state.player(0).turnsLeft === 0) {
+      clearInterval(intervalID);
+      await endGame();
+      return;
+    } else {
+      // - render new countrie
+      await controlCountryData();
+      // playerViews[0].setActive();
+    }
   }
 
-  // - render new countrie
-  await controlCountryData();
-
-  // switch active player only if other player has time left
-  if (!model.state.singlePlayer && model.state.restingPlayer().timeLeft > 0)
-    switchPlayer();
+  if (!model.state.singlePlayer) {
+    if (model.state.restingPlayer().turnsLeft === 0) {
+      clearInterval(intervalID);
+      await endGame();
+      return;
+    } else {
+      // - render new countrie
+      await controlCountryData();
+      switchPlayer();
+    }
+  }
 };
 
 // switch player and reset new active player's initial conditions for the new turn
@@ -235,40 +215,16 @@ const switchPlayer = function () {
   model.state.switchActivePlayer();
 
   // activate player view
-  playerViews[model.state.activePlayer().number].activateView();
+  activePlayerView().setActive();
 
   // start timer for new active player
   intervalID = setInterval(timer, 1000, model.state.activePlayer().number);
 };
 
-// flags graphic: displays a filled flag for every remaining turn(red or blue depending on turns outcome) and an empty one for the rest
-// function that returns flag icon source depending on guess outcome
-const flagSource = function (player) {
-  const sources = [];
-
-  for (let i = 1; i <= model.state.turns; i++) {
-    let src = flagEmpty;
-    if (
-      model.state.turns - model.state.player(player).turnsLeft >= i &&
-      model.state.activePlayer().guessValues[i - 1]
-    )
-      src = flagFilled;
-    if (
-      model.state.turns - model.state.player(player).turnsLeft >= i &&
-      !model.state.activePlayer().guessValues[i - 1]
-    )
-      src = flagRed;
-
-    sources.push(src);
-  }
-
-  return sources;
-};
-
 // end game modal with message, animation, options
 const endGame = async function () {
   playerViews.forEach(view => {
-    view.deactivateView();
+    view.setInactive();
     view.clearFlags();
     view.clearTimer();
     view.resetTimerColour();
