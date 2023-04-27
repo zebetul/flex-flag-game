@@ -144,7 +144,7 @@ export default class PlayerView extends View {
       await wait(1 / points);
     }
   }
-  renderTimer(seconds) {
+  renderTime(seconds) {
     // formating the time left in m:ss and displaying it
     this.#timerElement.textContent = formatTimer(seconds);
 

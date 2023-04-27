@@ -67,27 +67,21 @@ const timer = function () {
   // decrease timer for active player
   model.state.activePlayer().timeLeft -= 1;
 
-  activePlayerView().renderTimer(model.state.activePlayer().timeLeft);
+  activePlayerView().renderTime(model.state.activePlayer().timeLeft);
 
   // ----------> TIME IS UP END GAME SCENARIOS
   // if there are two players and active player's timer falls bellow 0 than change player
   if (!model.state.singlePlayer && model.state.activePlayer().timeLeft === 0) {
-    // delete timer
-    clearInterval(intervalID);
-
     // setting single player true for the rest of the game
     model.state.singlePlayer = true;
 
     switchPlayer();
   }
-
   // if single player and timer is up end game
   if (model.state.singlePlayer && model.state.activePlayer().timeLeft === 0) {
-    clearInterval(intervalID);
     endGame();
     return;
   }
-
   // if double player and both timers are up than end game
   if (
     !model.state.singlePlayer &&
@@ -178,24 +172,20 @@ const submit = async function () {
   // ---------->  NO TURNS LEFT END GAME SCENARIOS
   if (model.state.singlePlayer) {
     if (model.state.player(0).turnsLeft === 0) {
-      clearInterval(intervalID);
       await endGame();
       return;
     } else {
       // - render new countrie
       await controlCountryData();
-      // playerViews[0].setActive();
     }
   }
 
   if (!model.state.singlePlayer) {
     if (model.state.restingPlayer().turnsLeft === 0) {
-      clearInterval(intervalID);
       await endGame();
       return;
     } else {
       // stop current player's timer
-      clearInterval(intervalID);
 
       switchPlayer();
 
@@ -207,6 +197,8 @@ const submit = async function () {
 
 // switch player and reset new active player's initial conditions for the new turn
 const switchPlayer = function () {
+  clearInterval(intervalID);
+
   activePlayerView().setInactive();
 
   // - switching active player in state
@@ -221,6 +213,8 @@ const switchPlayer = function () {
 
 // end game modal with message, animation, options
 const endGame = async function () {
+  clearInterval(intervalID);
+
   playerViews.forEach(view => {
     view.setInactive();
     view.clearFlags();
