@@ -10,6 +10,7 @@ export const state = {
   countriesList: [],
   players: [],
   country: {},
+  gameEnd: false,
 
   addPlayer(player) {
     this.players.push(player);
@@ -39,8 +40,13 @@ export const state = {
     this.players.forEach(player => (player.active = !player.active));
   },
 
-  resetGuessValues() {
+  resetConditions() {
+    // reseting guessValues
     this.players.forEach(player => (player.guessValues = []));
+    this.players.forEach(player => (player.score = 0));
+    this.activePlayer = 0;
+    this.points = 21;
+    this.gameEnd = false;
   },
 };
 

@@ -144,12 +144,14 @@ export default class PlayerView extends View {
       await wait(1 / points);
     }
   }
-  renderTime(seconds) {
+  async renderTime(seconds) {
     // formating the time left in m:ss and displaying it
     this.#timerElement.textContent = formatTimer(seconds);
 
     // if less than 20 seconds left then timer blinks red
     if (seconds < TIME_WARNING) this.#timerBlinkAnimation();
+
+    await wait(1);
   }
   /**
    * returns an array with flagNumber elements each element is a flag icon source representing player's turns

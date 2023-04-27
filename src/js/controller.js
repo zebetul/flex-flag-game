@@ -29,9 +29,7 @@ const activePlayerView = function () {
 // New game initial conditions (score, turns left, timers, guessValues)
 const initData = async function () {
   try {
-    // instantiate players from Player class
-
-    // save players to state
+    // instantiate players from Player class and save them to state
     model.state.addPlayer(
       new Player(0, model.state.time, model.state.turns, true)
     );
@@ -50,10 +48,7 @@ const initData = async function () {
     activePlayerView().setActive();
 
     // start timer for active player
-    intervalID = setInterval(timer, 1000, model.state.activePlayer().number);
-
-    // reseting guessValues
-    model.state.resetGuessValues();
+    controlTimer();
 
     await controlCountryData();
   } catch (err) {
@@ -63,34 +58,38 @@ const initData = async function () {
 };
 
 // updates active player's timer decreasing it every second
-const timer = function () {
-  // decrease timer for active player
-  model.state.activePlayer().timeLeft -= 1;
+const controlTimer = async function () {
+  do {
+    await activePlayerView().renderTime(model.state.activePlayer().timeLeft);
 
-  activePlayerView().renderTime(model.state.activePlayer().timeLeft);
+    // ----------> TIME IS UP END GAME SCENARIOS
+    // SINGLE PLAYER
+    if (model.state.singlePlayer && model.state.activePlayer().timeLeft === 0) {
+      endGame();
+      return;
+    }
 
-  // ----------> TIME IS UP END GAME SCENARIOS
-  // if there are two players and active player's timer falls bellow 0 than change player
-  if (!model.state.singlePlayer && model.state.activePlayer().timeLeft === 0) {
-    // setting single player true for the rest of the game
-    model.state.singlePlayer = true;
+    // TWO PLAYERS
+    if (
+      !model.state.singlePlayer &&
+      model.state.activePlayer().timeLeft === 0
+    ) {
+      // setting single player true for the rest of the game
+      model.state.singlePlayer = true;
 
-    switchPlayer();
-  }
-  // if single player and timer is up end game
-  if (model.state.singlePlayer && model.state.activePlayer().timeLeft === 0) {
-    endGame();
-    return;
-  }
-  // if double player and both timers are up than end game
-  if (
-    !model.state.singlePlayer &&
-    model.state.player(0).timeLeft === 0 &&
-    model.state.player(1).timeLeft === 0
-  ) {
-    endGame();
-    return;
-  }
+      switchPlayer();
+    }
+    if (
+      !model.state.singlePlayer &&
+      model.state.player(0).timeLeft === 0 &&
+      model.state.player(1).timeLeft === 0
+    ) {
+      endGame();
+      return;
+    }
+
+    model.state.activePlayer().timeLeft -= 1;
+  } while (!model.state.gameEnd);
 };
 
 // 2. DISPLAYS A RANDOM COUNTRY'S FLAG AND SAVES COUNTRY'S DATA FOR LATER USE
@@ -122,7 +121,7 @@ const controlCountryData = async function () {
 
 // 3. BUTTON HELP EVENT HANDLER
 // displays a random fact about the country
-const renderFact = function () {
+const controlFact = function () {
   if (model.state.country.facts.length === 0) return;
 
   // choosing random fact from countryInfo object with splice
@@ -133,8 +132,6 @@ const renderFact = function () {
 
   // render fact
   countryView.renderFact(fact);
-
-  // if countryInfo array is empty hide help button
 
   // - decrease points
   model.state.points -= 3;
@@ -197,8 +194,6 @@ const submit = async function () {
 
 // switch player and reset new active player's initial conditions for the new turn
 const switchPlayer = function () {
-  clearInterval(intervalID);
-
   activePlayerView().setInactive();
 
   // - switching active player in state
@@ -206,21 +201,21 @@ const switchPlayer = function () {
 
   // activate player view
   activePlayerView().setActive();
-
-  // start timer for new active player
-  intervalID = setInterval(timer, 1000, model.state.activePlayer().number);
 };
 
 // end game modal with message, animation, options
 const endGame = async function () {
-  clearInterval(intervalID);
+  model.state.gameEnd = true;
 
+  // reset player views
   playerViews.forEach(view => {
     view.setInactive();
     view.clearFlags();
     view.clearTimer();
     view.resetTimerColour();
   });
+
+  // model.state.resetConditions();
 
   consoleView.slideIn();
 };
@@ -270,7 +265,7 @@ const startNew = async function () {
   await initData();
 
   playerViews.forEach(view => view.addHandlerGuess(submit));
-  playerViews.forEach(view => view.addHandlerHelp(renderFact));
+  playerViews.forEach(view => view.addHandlerHelp(controlFact));
 };
 
 // ----------> INIT ---------------

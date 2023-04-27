@@ -135,7 +135,7 @@ export const titleAnimation = async function () {
 
   _slideInTitle();
 
-  await wait(0.6);
+  // await wait(0.2);
 
   _arrangeTitleFLEX();
 };
