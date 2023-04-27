@@ -63,29 +63,15 @@ const controlTimer = async function () {
     await activePlayerView().renderTime(model.state.activePlayer().timeLeft);
 
     // ----------> TIME IS UP END GAME SCENARIOS
-    // SINGLE PLAYER
-    if (model.state.singlePlayer && model.state.activePlayer().timeLeft === 0) {
+    if (model.state.checkGameEnd()) {
       endGame();
       return;
     }
 
-    // TWO PLAYERS
-    if (
-      !model.state.singlePlayer &&
-      model.state.activePlayer().timeLeft === 0
-    ) {
+    if (model.state.activePlayer().timeLeft === 0) {
       // setting single player true for the rest of the game
       model.state.singlePlayer = true;
-
       switchPlayer();
-    }
-    if (
-      !model.state.singlePlayer &&
-      model.state.player(0).timeLeft === 0 &&
-      model.state.player(1).timeLeft === 0
-    ) {
-      endGame();
-      return;
     }
 
     model.state.activePlayer().timeLeft -= 1;
@@ -167,29 +153,15 @@ const submit = async function () {
   await wait(2);
 
   // ---------->  NO TURNS LEFT END GAME SCENARIOS
-  if (model.state.singlePlayer) {
-    if (model.state.player(0).turnsLeft === 0) {
-      await endGame();
-      return;
-    } else {
-      // - render new countrie
-      await controlCountryData();
-    }
+  if (model.state.checkGameEnd()) {
+    await endGame();
+    return;
   }
 
-  if (!model.state.singlePlayer) {
-    if (model.state.restingPlayer().turnsLeft === 0) {
-      await endGame();
-      return;
-    } else {
-      // stop current player's timer
+  if (!model.state.singlePlayer && model.state.restingPlayer().turnsLeft > 0)
+    switchPlayer();
 
-      switchPlayer();
-
-      // - render new countrie
-      await controlCountryData();
-    }
-  }
+  await controlCountryData();
 };
 
 // switch player and reset new active player's initial conditions for the new turn
@@ -205,8 +177,6 @@ const switchPlayer = function () {
 
 // end game modal with message, animation, options
 const endGame = async function () {
-  model.state.gameEnd = true;
-
   // reset player views
   playerViews.forEach(view => {
     view.setInactive();

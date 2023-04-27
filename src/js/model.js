@@ -48,6 +48,25 @@ export const state = {
     this.points = 21;
     this.gameEnd = false;
   },
+
+  checkGameEnd() {
+    if (
+      this.singlePlayer &&
+      (this.activePlayer().timeLeft === 0 ||
+        this.activePlayer().turnsLeft === 0)
+    )
+      this.gameEnd = true;
+
+    if (
+      !this.singlePlayer &&
+      ((this.activePlayer().timeLeft === 0 &&
+        this.restingPlayer().timeLeft === 0) ||
+        this.player(1).turnsLeft === 0)
+    )
+      this.gameEnd = true;
+
+    return this.gameEnd;
+  },
 };
 
 const createCountryObject = function (data) {
