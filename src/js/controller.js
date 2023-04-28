@@ -20,8 +20,6 @@ const player1View = new PlayerView(0, true);
 const player2View = new PlayerView(1, false);
 const playerViews = [player1View, player2View];
 
-let intervalID;
-
 const activePlayerView = function () {
   return playerViews[model.state.activePlayer().number];
 };
@@ -62,7 +60,6 @@ const controlTimer = async function () {
   do {
     await activePlayerView().renderTime(model.state.activePlayer().timeLeft);
 
-    // ----------> TIME IS UP END GAME SCENARIOS
     if (model.state.checkGameEnd()) {
       endGame();
       return;
@@ -90,13 +87,7 @@ const controlCountryData = async function () {
     // - hide country name and display points
     countryView.renderName(model.state.points);
 
-    // selectting a random country name
-    const rnd = Math.trunc(Math.random() * model.state.countriesList.length);
-
-    // extracting country and deleting it from the array to not select it again in the same game
-    const country = model.state.countriesList.splice(rnd, 1)[0];
-
-    await model.loadCountry(country);
+    await model.loadCountry();
 
     countryView.renderFlag(model.state.country.flag);
   } catch (err) {
@@ -105,21 +96,13 @@ const controlCountryData = async function () {
   }
 };
 
-// 3. BUTTON HELP EVENT HANDLER
 // displays a random fact about the country
 const controlFact = function () {
+  // if no more facts available then return
   if (model.state.country.facts.length === 0) return;
 
-  // choosing random fact from countryInfo object with splice
-  const fact = model.state.country.facts.splice(
-    Math.trunc(Math.random() * model.state.country.facts.length),
-    1
-  )[0];
+  countryView.renderFact(model.state.getFact());
 
-  // render fact
-  countryView.renderFact(fact);
-
-  // - decrease points
   model.state.points -= 3;
   countryView.renderName(model.state.points);
 };

@@ -9,12 +9,4 @@ export default class Player {
     this.turnsLeft = turnsLeft;
     this.active = active;
   }
-
-  setScore(score) {
-    this.score = score;
-  }
-
-  getScore() {
-    return this.score;
-  }
 }
