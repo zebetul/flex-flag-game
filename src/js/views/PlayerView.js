@@ -224,10 +224,9 @@ export default class PlayerView extends View {
       duration: 1,
     });
   }
-  slide(data) {
+  slide(xOffset) {
     gsap.to(this.parentElement, {
-      x: `${data}rem`,
-      display: 'flex',
+      x: `${xOffset}rem`,
       duration: 1,
       ease: 'circ',
     });

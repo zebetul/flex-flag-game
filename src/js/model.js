@@ -10,6 +10,7 @@ export const state = {
   players: [],
   playerViews: [],
   country: {},
+  countryGuessed: true,
   gameEnd: false,
 
   saveSettings(settings) {
@@ -35,16 +36,16 @@ export const state = {
   restingPlayer() {
     return this.players.find(player => player.active === false);
   },
-  activePlayerView() {
+  getActivePlayerView() {
     return this.playerViews[this.getActivePlayer().number];
   },
   switchActivePlayer() {
-    this.activePlayerView().setInactive();
+    this.getActivePlayerView().setInactive();
 
     // swiching active between players
     this.players.forEach(player => (player.active = !player.active));
 
-    this.activePlayerView().setActive();
+    this.getActivePlayerView().setActive();
   },
   getFact() {
     // choosing random fact from countryInfo object with splice
@@ -53,25 +54,21 @@ export const state = {
       1
     )[0];
   },
-  async controlGuessOutcome() {
-    if (this.country.name === this.activePlayerView().getCountry()) {
-      // add quess outcome boolean value element to guessOutcome array for active player
-      this.getActivePlayer().guessValues.push(true);
-
-      this.getActivePlayer().score += this.points;
-
-      await this.activePlayerView().renderScore(this.getActivePlayer().score);
-    } else {
-      this.getActivePlayer().guessValues.push(false);
-
-      this.activePlayerView().renderMissedAnimation();
+  checkGuessOutcome() {
+    if (this.country.name !== this.getActivePlayerView().getCountry()) {
+      this.countryGuessed = false;
+      this.points = 0;
     }
+
+    if (this.country.name === this.getActivePlayerView().getCountry())
+      this.countryGuessed = true;
   },
   resetConditions() {
     // reseting guessValues
     this.players = [];
     this.playerViews = [];
     this.points = 21;
+    this.guessOutcome = false;
     this.gameEnd = false;
   },
   checkGameEnd() {
@@ -144,6 +141,8 @@ export const loadCountry = async function () {
     );
 
     state.country = createCountryObject(countryData[0]);
+    console.log(countryData[0]);
+    console.log(state.country);
   } catch (err) {
     // Temporary error handling
     console.error(`Country fetching Error:💥💥💥💥 ${err}`);
