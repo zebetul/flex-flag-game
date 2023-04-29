@@ -9,56 +9,38 @@ export const state = {
   points: 21,
   countriesList: [],
   players: [],
+  playerViews: [],
   country: {},
   gameEnd: false,
 
   saveSettings(settings) {
     this.numberOfPlayers = settings.numberOfPlayers;
+    if (settings.numberOfPlayers === 1) this.singlePlayer = true;
+    if (settings.numberOfPlayers === 2) this.singlePlayer = false;
+
     this.time = settings.time;
     this.turns = settings.turns;
-
-    if (this.numberOfPlayers === 1) this.singlePlayer = true;
   },
   addPlayer(player) {
     this.players.push(player);
   },
+  addPlayerView(view) {
+    this.playerViews.push(view);
+  },
   player(number) {
     return this.players.find(player => player.number === number);
   },
-  activePlayer() {
+  getActivePlayer() {
     return this.players.find(player => player.active);
   },
   restingPlayer() {
     return this.players.find(player => player.active === false);
   },
+  activePlayerView() {
+    return this.playerViews[this.getActivePlayer().number];
+  },
   switchActivePlayer() {
     this.players.forEach(player => (player.active = !player.active));
-  },
-  resetConditions() {
-    // reseting guessValues
-    this.players.forEach(player => (player.guessValues = []));
-    this.players.forEach(player => (player.score = 0));
-    this.activePlayer = 0;
-    this.points = 21;
-    this.gameEnd = false;
-  },
-  checkGameEnd() {
-    if (
-      this.singlePlayer &&
-      (this.activePlayer().timeLeft === 0 ||
-        this.activePlayer().turnsLeft === 0)
-    )
-      this.gameEnd = true;
-
-    if (
-      !this.singlePlayer &&
-      ((this.activePlayer().timeLeft === 0 &&
-        this.restingPlayer().timeLeft === 0) ||
-        this.player(1).turnsLeft === 0)
-    )
-      this.gameEnd = true;
-
-    return this.gameEnd;
   },
   getFact() {
     // choosing random fact from countryInfo object with splice
@@ -66,6 +48,32 @@ export const state = {
       Math.trunc(Math.random() * this.country.facts.length),
       1
     )[0];
+  },
+  resetConditions() {
+    // reseting guessValues
+    this.players = [];
+    this.playerViews = [];
+    this.activePlayer = 0;
+    this.points = 21;
+    this.gameEnd = false;
+  },
+  checkGameEnd() {
+    if (
+      this.singlePlayer &&
+      (this.getActivePlayer().timeLeft === 0 ||
+        this.getActivePlayer().turnsLeft === 0)
+    )
+      this.gameEnd = true;
+
+    if (
+      !this.singlePlayer &&
+      ((this.getActivePlayer().timeLeft === 0 &&
+        this.restingPlayer().timeLeft === 0) ||
+        this.player(1).turnsLeft === 0)
+    )
+      this.gameEnd = true;
+
+    return this.gameEnd;
   },
 };
 

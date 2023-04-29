@@ -15,7 +15,6 @@ const _setFlegsPosition = function () {
     })
   );
 };
-
 const _fadingInFlags = async function () {
   // selecting all flag elements in an array
   const flags = [...document.querySelectorAll('.flag__intro')];
@@ -36,7 +35,6 @@ const _fadingInFlags = async function () {
     await wait(0.05);
   }
 };
-
 const _slidingOut = async function () {
   await gsap.to('.flag__intro', {
     x: '100rem',
@@ -46,7 +44,6 @@ const _slidingOut = async function () {
     ease: 'power2.in',
   });
 };
-
 // GAME TITLE SLIDE IN ANIMATION
 // set title elements initial position
 const _setElementsPosition = function () {
@@ -74,7 +71,6 @@ const _setElementsPosition = function () {
       });
   });
 };
-
 // moves elements to the specified position, height, rotation
 const _positionElement = function (elem, x, y, height, rot) {
   gsap.to(`.${elem}`, {
@@ -85,7 +81,6 @@ const _positionElement = function (elem, x, y, height, rot) {
     duration: 1,
   });
 };
-
 // arranging elements in final FLAX format
 const _arrangeTitleFLEX = function () {
   // F
@@ -105,7 +100,6 @@ const _arrangeTitleFLEX = function () {
   _positionElement('x__2', 23, -0.5, 6, -35);
   _positionElement('x__3', 27.5, 5, 7, -35);
 };
-
 // sliding in title animation
 const _slideInTitle = async function () {
   await gsap.to('.game__title', {
@@ -114,7 +108,6 @@ const _slideInTitle = async function () {
     ease: 'back.out(3)',
   });
 };
-
 export const flagAnimation = async function () {
   // setting initial position, scale and opacity
   _setFlegsPosition();
@@ -129,7 +122,6 @@ export const flagAnimation = async function () {
 
   // await wait(0.7);
 };
-
 export const titleAnimation = async function () {
   _setElementsPosition();
 
@@ -139,7 +131,6 @@ export const titleAnimation = async function () {
 
   _arrangeTitleFLEX();
 };
-
 // MENU ITEMS SLIDE IN ANIMATION
 export const menuItemsAnim = async function () {
   // selecting menu items without title element

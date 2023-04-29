@@ -8,74 +8,30 @@ import * as model from './model';
 import consoleView from './views/ConsoleView';
 import PlayerView from './views/PlayerView';
 import countryView from './views/CountryView';
-
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import { async } from 'regenerator-runtime';
 
-gsap.registerPlugin(MotionPathPlugin);
-
-// instantiate playerViews, one for each player
-const player1View = new PlayerView(0, true);
-const player2View = new PlayerView(1, false);
-const playerViews = [player1View, player2View];
-
-const activePlayerView = function () {
-  return playerViews[model.state.activePlayer().number];
-};
-
-// New game initial conditions (score, turns left, timers, guessValues)
-const initData = async function () {
-  try {
-    // instantiate players from Player class and save them to state
-    model.state.addPlayer(
-      new Player(0, model.state.time, model.state.turns, true)
-    );
-    model.state.addPlayer(
-      new Player(1, model.state.time, model.state.turns, false)
-    );
-
-    // displaying turns left for each player
-    playerViews[0].renderFlags(model.state.player(0), model.state.turns);
-    playerViews[1].renderFlags(model.state.player(1), model.state.turns);
-
-    await model.loadCountriesList();
-    player1View.renderCountriesList(model.state.countriesList);
-    player2View.renderCountriesList(model.state.countriesList);
-
-    activePlayerView().setActive();
-
-    // start timer for active player
-    controlTimer();
-
-    await controlCountryData();
-  } catch (err) {
-    countryView.render(`💣💣💣 Something went wrong:${err}`);
-    console.error(err);
-  }
-};
-
-// updates active player's timer decreasing it every second
 const controlTimer = async function () {
   do {
-    await activePlayerView().renderTime(model.state.activePlayer().timeLeft);
+    await model.state
+      .activePlayerView()
+      .renderTime(model.state.getActivePlayer().timeLeft);
 
     if (model.state.checkGameEnd()) {
       endGame();
       return;
     }
 
-    if (model.state.activePlayer().timeLeft === 0) {
+    if (model.state.getActivePlayer().timeLeft === 0) {
+      switchPlayer();
       // setting single player true for the rest of the game
       model.state.singlePlayer = true;
-      switchPlayer();
     }
 
-    model.state.activePlayer().timeLeft -= 1;
+    model.state.getActivePlayer().timeLeft -= 1;
   } while (!model.state.gameEnd);
 };
-
-// 2. DISPLAYS A RANDOM COUNTRY'S FLAG AND SAVES COUNTRY'S DATA FOR LATER USE
 const controlCountryData = async function () {
   try {
     // - empty country data container
@@ -95,8 +51,6 @@ const controlCountryData = async function () {
     console.error(`💣💣💣 Error :${err.message}`);
   }
 };
-
-// displays a random fact about the country
 const controlFact = function () {
   // if no more facts available then return
   if (model.state.country.facts.length === 0) return;
@@ -106,32 +60,36 @@ const controlFact = function () {
   model.state.points -= 3;
   countryView.renderName(model.state.points);
 };
-
 const controlGuessOutcome = async function () {
-  if (model.state.country.name === activePlayerView().getCountry()) {
+  if (
+    model.state.country.name === model.state.activePlayerView().getCountry()
+  ) {
     // add quess outcome boolean value element to guessOutcome array for active player
-    model.state.activePlayer().guessValues.push(true);
+    model.state.getActivePlayer().guessValues.push(true);
 
-    model.state.activePlayer().score += model.state.points;
+    model.state.getActivePlayer().score += model.state.points;
 
-    await activePlayerView().renderScore(model.state.activePlayer().score);
+    await model.state
+      .activePlayerView()
+      .renderScore(model.state.getActivePlayer().score);
   } else {
-    activePlayerView().renderMissedAnimation();
+    model.state.activePlayerView().renderMissedAnimation();
 
-    model.state.activePlayer().guessValues.push(false);
+    model.state.getActivePlayer().guessValues.push(false);
   }
 };
-
 const submit = async function () {
   countryView.renderName(model.state.country.name);
 
   controlGuessOutcome();
 
   // update the number of turns remaining for the current player
-  model.state.activePlayer().turnsLeft -= 1;
+  model.state.getActivePlayer().turnsLeft -= 1;
 
   // display remaining turns for current player
-  activePlayerView().renderFlags(model.state.activePlayer(), model.state.turns);
+  model.state
+    .activePlayerView()
+    .renderFlags(model.state.getActivePlayer(), model.state.turns);
 
   await wait(2);
 
@@ -146,35 +104,26 @@ const submit = async function () {
 
   await controlCountryData();
 };
-
-// switch player and reset new active player's initial conditions for the new turn
 const switchPlayer = function () {
-  activePlayerView().setInactive();
+  model.state.activePlayerView().setInactive();
 
   // - switching active player in state
   model.state.switchActivePlayer();
 
   // activate player view
-  activePlayerView().setActive();
+  model.state.activePlayerView().setActive();
 };
-
-// end game modal with message, animation, options
 const endGame = async function () {
   // reset player views
-  playerViews.forEach(view => {
+  model.state.playerViews.forEach(view => {
     view.setInactive();
     view.clearFlags();
     view.clearTimer();
     view.resetTimerColour();
   });
 
-  // model.state.resetConditions();
-
   consoleView.slideIn();
 };
-
-// ----------> ANIMATIONS --------
-// game intro(load) animation
 const loadAnimation = async function () {
   // // Rendering flag icons in console view
   // consoleView.render(flagIcons.generateMarkUp());
@@ -190,37 +139,68 @@ const loadAnimation = async function () {
 
   await animations.menuItemsAnim();
 };
-
-// start new game animation(modal window and player section sliders in/out)
 const initAnim = async function () {
   // when a two player game ended and next game will be single player -> slide back player 2
   if (model.state.singlePlayer && gsap.getProperty('.section__1', 'x') === 22)
-    player2View.slide(-22);
+    model.state.playerViews[1].slide(-22);
 
   // animate first player's section
-  player1View.slide(-57);
+  model.state.playerViews[0].slide(-57);
 
   // if double player than animate other player's section
-  if (!model.state.singlePlayer) player2View.slide(22);
+  if (!model.state.singlePlayer) model.state.playerViews[1].slide(22);
 
   await wait(1);
 
   // slide out modal window
   consoleView.slideOut();
 };
-
 // ----------> START NEW GAME -------------------------------
 const startNew = async function () {
-  model.state.saveSettings(consoleView.readGameSettings());
+  try {
+    if (model.state.gameEnd) model.state.resetConditions();
 
-  await initAnim();
+    model.state.saveSettings(consoleView.readGameSettings());
 
-  await initData();
+    // Adding players
+    model.state.addPlayer(
+      new Player(0, model.state.time, model.state.turns, true)
+    );
+    model.state.addPlayer(
+      new Player(1, model.state.time, model.state.turns, false)
+    );
 
-  playerViews.forEach(view => view.addHandlerGuess(submit));
-  playerViews.forEach(view => view.addHandlerHelp(controlFact));
+    // Adding a playerView for each player
+    model.state.players.forEach((player, i) =>
+      model.state.addPlayerView(new PlayerView(i, player.active))
+    );
+
+    await model.loadCountriesList();
+
+    // displaying turns left and countries list for each player
+    model.state.playerViews.forEach((view, i) => {
+      view.renderFlags(model.state.player(i), model.state.turns);
+      view.renderCountriesList(model.state.countriesList);
+    });
+
+    await controlCountryData();
+
+    await initAnim();
+
+    model.state.activePlayerView().setActive();
+
+    controlTimer();
+
+    // Adding event handlers to player views
+    model.state.playerViews.forEach(view => {
+      view.addHandlerGuess(submit);
+      view.addHandlerHelp(controlFact);
+    });
+  } catch (err) {
+    countryView.render(`💣💣💣 Something went wrong:${err}`);
+    console.error(err);
+  }
 };
-
 // ----------> INIT ---------------
 (async function () {
   // await wait(0.5);
