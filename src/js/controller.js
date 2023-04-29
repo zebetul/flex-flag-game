@@ -34,17 +34,11 @@ const controlTimer = async function () {
 };
 const controlCountryData = async function () {
   try {
-    // - empty country data container
-    countryView.clearFacts();
-
-    // - reseting points
+    await model.loadCountry();
     model.state.points = 21;
 
-    // - hide country name and display points
+    countryView.clearFacts();
     countryView.renderName(model.state.points);
-
-    await model.loadCountry();
-
     countryView.renderFlag(model.state.country.flag);
   } catch (err) {
     countryView.render(`💣💣💣 Something went wrong:${err}`);
@@ -60,28 +54,10 @@ const controlFact = function () {
   model.state.points -= 3;
   countryView.renderName(model.state.points);
 };
-const controlGuessOutcome = async function () {
-  if (
-    model.state.country.name === model.state.activePlayerView().getCountry()
-  ) {
-    // add quess outcome boolean value element to guessOutcome array for active player
-    model.state.getActivePlayer().guessValues.push(true);
-
-    model.state.getActivePlayer().score += model.state.points;
-
-    await model.state
-      .activePlayerView()
-      .renderScore(model.state.getActivePlayer().score);
-  } else {
-    model.state.getActivePlayer().guessValues.push(false);
-
-    model.state.activePlayerView().renderMissedAnimation();
-  }
-};
 const submit = async function () {
   countryView.renderName(model.state.country.name);
 
-  controlGuessOutcome();
+  await model.state.controlGuessOutcome();
 
   model.state.getActivePlayer().turnsLeft -= 1;
 

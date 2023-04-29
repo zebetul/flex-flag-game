@@ -53,6 +53,20 @@ export const state = {
       1
     )[0];
   },
+  async controlGuessOutcome() {
+    if (this.country.name === this.activePlayerView().getCountry()) {
+      // add quess outcome boolean value element to guessOutcome array for active player
+      this.getActivePlayer().guessValues.push(true);
+
+      this.getActivePlayer().score += this.points;
+
+      await this.activePlayerView().renderScore(this.getActivePlayer().score);
+    } else {
+      this.getActivePlayer().guessValues.push(false);
+
+      this.activePlayerView().renderMissedAnimation();
+    }
+  },
   resetConditions() {
     // reseting guessValues
     this.players = [];
