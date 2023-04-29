@@ -4,7 +4,6 @@ export const state = {
   numberOfPlayers: 0,
   time: 0,
   turns: 0,
-  activePlayer: 0,
   singlePlayer: false,
   points: 21,
   countriesList: [],
@@ -40,7 +39,12 @@ export const state = {
     return this.playerViews[this.getActivePlayer().number];
   },
   switchActivePlayer() {
+    this.activePlayerView().setInactive();
+
+    // swiching active between players
     this.players.forEach(player => (player.active = !player.active));
+
+    this.activePlayerView().setActive();
   },
   getFact() {
     // choosing random fact from countryInfo object with splice
@@ -53,7 +57,6 @@ export const state = {
     // reseting guessValues
     this.players = [];
     this.playerViews = [];
-    this.activePlayer = 0;
     this.points = 21;
     this.gameEnd = false;
   },

@@ -24,7 +24,7 @@ const controlTimer = async function () {
     }
 
     if (model.state.getActivePlayer().timeLeft === 0) {
-      switchPlayer();
+      model.state.switchActivePlayer();
       // setting single player true for the rest of the game
       model.state.singlePlayer = true;
     }
@@ -73,9 +73,9 @@ const controlGuessOutcome = async function () {
       .activePlayerView()
       .renderScore(model.state.getActivePlayer().score);
   } else {
-    model.state.activePlayerView().renderMissedAnimation();
-
     model.state.getActivePlayer().guessValues.push(false);
+
+    model.state.activePlayerView().renderMissedAnimation();
   }
 };
 const submit = async function () {
@@ -83,10 +83,8 @@ const submit = async function () {
 
   controlGuessOutcome();
 
-  // update the number of turns remaining for the current player
   model.state.getActivePlayer().turnsLeft -= 1;
 
-  // display remaining turns for current player
   model.state
     .activePlayerView()
     .renderFlags(model.state.getActivePlayer(), model.state.turns);
@@ -100,18 +98,9 @@ const submit = async function () {
   }
 
   if (!model.state.singlePlayer && model.state.restingPlayer().turnsLeft > 0)
-    switchPlayer();
+    model.state.switchActivePlayer();
 
   await controlCountryData();
-};
-const switchPlayer = function () {
-  model.state.activePlayerView().setInactive();
-
-  // - switching active player in state
-  model.state.switchActivePlayer();
-
-  // activate player view
-  model.state.activePlayerView().setActive();
 };
 const endGame = async function () {
   // reset player views
