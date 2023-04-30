@@ -15,15 +15,18 @@ export default class PlayerView extends View {
   #countriesListElement;
   #btnHelp;
   #btnGuess;
+  #xOffset;
 
   score = 0;
 
-  constructor(playerNumber, active) {
+  constructor(playerNumber, active, xOffset) {
     super();
 
     this.#playerNumber = playerNumber;
 
     this.#active = active;
+
+    this.#xOffset = xOffset;
 
     this.parentElement = document.querySelector(
       `.section__${this.#playerNumber}`
@@ -224,9 +227,16 @@ export default class PlayerView extends View {
       duration: 1,
     });
   }
-  slide(xOffset) {
+  slideIn() {
     gsap.to(this.parentElement, {
-      x: `${xOffset}rem`,
+      x: `${this.#xOffset}rem`,
+      duration: 1,
+      ease: 'circ',
+    });
+  }
+  slideOut() {
+    gsap.to(this.parentElement, {
+      x: `0rem`,
       duration: 1,
       ease: 'circ',
     });

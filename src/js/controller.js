@@ -4,7 +4,7 @@ import gameTitle from './gameTitle';
 import { wait } from './helpers';
 import * as animations from './animations';
 import Player from './Player';
-import * as model from './model';
+import { state, loadCountriesList, loadCountry } from './model';
 import consoleView from './views/ConsoleView';
 import PlayerView from './views/PlayerView';
 import countryView from './views/CountryView';
@@ -14,27 +14,27 @@ import { async } from 'regenerator-runtime';
 
 const controlTimer = async function () {
   do {
-    await model.state
+    await state
       .getActivePlayerView()
-      .renderTime(model.state.getActivePlayer().timeLeft);
+      .renderTime(state.getActivePlayer().timeLeft);
 
-    if (model.state.checkGameEnd()) {
+    if (state.checkGameEnd()) {
       endGame();
       return;
     }
 
-    if (model.state.getActivePlayer().timeLeft === 0) {
-      model.state.switchActivePlayer();
+    if (state.getActivePlayer().timeLeft === 0) {
+      state.switchActivePlayer();
       // setting single player true for the rest of the game
-      model.state.singlePlayer = true;
+      state.singlePlayer = true;
     }
 
-    model.state.getActivePlayer().timeLeft -= 1;
-  } while (!model.state.gameEnd);
+    state.getActivePlayer().timeLeft -= 1;
+  } while (!state.gameEnd);
 };
 const endGame = async function () {
   // reset player views
-  model.state.playerViews.forEach(view => {
+  state.playerViews.forEach(view => {
     view.setInactive();
     view.clearFlags();
     view.clearTimer();
@@ -47,116 +47,91 @@ const endGame = async function () {
 };
 const controlFact = function () {
   // if no more facts available then return
-  if (model.state.country.facts.length === 0) return;
+  if (state.country.facts.length === 0) return;
 
-  countryView.renderFact(model.state.getFact());
+  countryView.renderFact(state.getFact());
 
-  model.state.points -= 3;
-  countryView.renderName(model.state.points);
+  state.points -= 3;
+  countryView.renderName(state.points);
 };
 const submit = async function () {
-  countryView.renderName(model.state.country.name);
+  countryView.renderName(state.country.name);
 
-  model.state.checkGuessOutcome();
+  state.checkGuessOutcome();
 
-  model.state.getActivePlayer().score += model.state.points;
+  state.getActivePlayer().score += state.points;
 
-  if (model.state.countryGuessed)
-    await model.state
+  if (state.countryGuessed)
+    await state
       .getActivePlayerView()
-      .renderScore(model.state.getActivePlayer().score);
+      .renderScore(state.getActivePlayer().score);
 
-  if (!model.state.countryGuessed)
-    model.state.getActivePlayerView().renderMissedAnimation();
+  if (!state.countryGuessed)
+    state.getActivePlayerView().renderMissedAnimation();
 
-  model.state.getActivePlayer().guessValues.push(model.state.countryGuessed);
+  state.getActivePlayer().guessValues.push(state.countryGuessed);
 
-  model.state.getActivePlayer().turnsLeft -= 1;
+  state.getActivePlayer().turnsLeft -= 1;
 
-  model.state
-    .getActivePlayerView()
-    .renderFlags(model.state.getActivePlayer(), model.state.turns);
+  state.getActivePlayerView().renderFlags(state.getActivePlayer(), state.turns);
 
   await wait(2);
 
   // ---------->  NO TURNS LEFT END GAME SCENARIOS
-  if (model.state.checkGameEnd()) {
+  if (state.checkGameEnd()) {
     await endGame();
     return;
   }
 
-  if (!model.state.singlePlayer && model.state.restingPlayer().turnsLeft > 0)
-    model.state.switchActivePlayer();
+  if (!state.singlePlayer && state.restingPlayer().turnsLeft > 0)
+    state.switchActivePlayer();
 
   countryView.clearFacts();
 
-  await model.loadCountry();
+  await loadCountry();
 
-  countryView.renderFlag(model.state.country.flag);
+  countryView.renderFlag(state.country.flag);
 
-  model.state.points = 21;
-  countryView.renderName(model.state.points);
-};
-const initAnim = async function () {
-  // when a two player game ended and next game will be single player -> slide back player 2
-  if (model.state.singlePlayer && gsap.getProperty('.section__1', 'x') === 39)
-    model.state.playerViews[1].slide(0);
-
-  console.log(gsap.getProperty('.section__1', 'x'));
-
-  // animate first player's section
-  model.state.playerViews[0].slide(-39);
-
-  // if double player than animate other player's section
-  if (!model.state.singlePlayer) model.state.playerViews[1].slide(39);
-
-  await wait(1);
-
-  // slide out modal window
-  consoleView.slideOut();
+  state.points = 21;
+  countryView.renderName(state.points);
 };
 // ----------> START NEW GAME -------------------------------
 const startNew = async function () {
   try {
-    if (model.state.gameEnd) model.state.resetConditions();
+    if (state.gameEnd) state.resetConditions();
 
-    model.state.saveSettings(consoleView.readGameSettings());
-
-    // Adding players
-    model.state.addPlayer(
-      new Player(0, model.state.time, model.state.turns, true)
-    );
-    model.state.addPlayer(
-      new Player(1, model.state.time, model.state.turns, false)
-    );
-
-    // Adding a playerView for each player
-    model.state.players.forEach((player, i) =>
-      model.state.addPlayerView(new PlayerView(i, player.active))
-    );
-
-    await model.loadCountriesList();
-
+    state.saveSettings(consoleView.readGameSettings());
+    state.addPlayer(new Player(0, state.time, state.turns, true));
+    state.addPlayer(new Player(1, state.time, state.turns, false));
+    state.addPlayerView(new PlayerView(0, true, -39));
+    state.addPlayerView(new PlayerView(1, false, 39));
+    await loadCountriesList();
     // displaying turns left and countries list for each player
-    model.state.playerViews.forEach((view, i) => {
-      view.renderFlags(model.state.player(i), model.state.turns);
-      view.renderCountriesList(model.state.countriesList);
+    state.playerViews.forEach((view, i) => {
+      view.renderFlags(state.player(i), state.turns);
+      view.renderCountriesList(state.countriesList);
     });
 
-    await model.loadCountry();
+    await loadCountry();
+    countryView.renderFlag(state.country.flag);
+    countryView.renderName(state.points);
 
-    countryView.renderFlag(model.state.country.flag);
+    // when a two player game ended and next game will be single player then slide out player 2
+    if (state.singlePlayer && gsap.getProperty('.section__1', 'x') === 39)
+      state.playerViews[1].slideOut();
+    state.playerViews[0].slideIn();
+    if (!state.singlePlayer) state.playerViews[1].slideIn();
 
-    countryView.renderName(model.state.points);
+    await wait(1);
 
-    await initAnim();
+    consoleView.slideOut();
 
-    model.state.getActivePlayerView().setActive();
+    state.getActivePlayerView().setActive();
 
     controlTimer();
 
     // Adding event handlers to player views
-    model.state.playerViews.forEach(view => {
+    state.playerViews.forEach(view => {
       view.addHandlerGuess(submit);
       view.addHandlerHelp(controlFact);
     });
