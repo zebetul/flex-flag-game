@@ -15,7 +15,6 @@ class CountryView extends View {
     this.#nameElement = document.querySelector('.country__name');
     this.#factsElement = document.querySelector('.country__data');
   }
-
   #generateMarkUp() {
     return `
     <h3 class="country__name"></h3>
@@ -25,15 +24,12 @@ class CountryView extends View {
     <div class="country__data"></div>
     `;
   }
-
   renderName(content) {
     this.#nameElement.textContent = content;
   }
-
   renderFlag(source) {
     this.#flagElement.src = source;
   }
-
   renderFact(fact) {
     const markUp = `<p class="country__row"><span></span>${fact[0]}: ${fact[1]}</p>`;
     this.#factsElement.insertAdjacentHTML('afterbegin', markUp);
@@ -44,7 +40,6 @@ class CountryView extends View {
       duration: 0.5,
     });
   }
-
   clearFacts() {
     this.#factsElement.textContent = '';
   }

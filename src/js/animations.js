@@ -102,7 +102,7 @@ const _arrangeTitleFLEX = function () {
 };
 // sliding in title animation
 const _slideInTitle = async function () {
-  await gsap.to('.game__title', {
+  await gsap.to('.console__game-title', {
     x: '35rem',
     duration: 1,
     ease: 'back.out(3)',
@@ -134,9 +134,7 @@ export const titleAnimation = async function () {
 // MENU ITEMS SLIDE IN ANIMATION
 export const menuItemsAnim = async function () {
   // selecting menu items without title element
-  const [title, ...items] = [
-    ...document.querySelector('.console__window').children,
-  ];
+  const [title, ...items] = [...document.querySelector('.console').children];
 
   // animating items
   gsap.to(items, {

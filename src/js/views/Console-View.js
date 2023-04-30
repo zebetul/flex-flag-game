@@ -3,7 +3,7 @@ import { View } from './View';
 class ConsoleView extends View {
   constructor() {
     super();
-    this.parentElement = document.querySelector('.console__window');
+    this.parentElement = document.querySelector('.console');
   }
 
   addHandlerStart(handler) {

@@ -5,7 +5,7 @@ import { wait } from './helpers';
 import * as animations from './animations';
 import Player from './Player';
 import { state, loadCountriesList, loadCountry } from './model';
-import consoleView from './views/ConsoleView';
+import consoleView from './views/Console-View';
 import PlayerView from './views/PlayerView';
 import countryView from './views/CountryView';
 import 'core-js/stable';
@@ -56,9 +56,7 @@ const controlFact = function () {
 };
 const submit = async function () {
   countryView.renderName(state.country.name);
-
   state.checkGuessOutcome();
-
   state.getActivePlayer().score += state.points;
 
   if (state.countryGuessed)
@@ -70,11 +68,8 @@ const submit = async function () {
     state.getActivePlayerView().renderMissedAnimation();
 
   state.getActivePlayer().guessValues.push(state.countryGuessed);
-
   state.getActivePlayer().turnsLeft -= 1;
-
   state.getActivePlayerView().renderFlags(state.getActivePlayer(), state.turns);
-
   await wait(2);
 
   // ---------->  NO TURNS LEFT END GAME SCENARIOS
@@ -87,11 +82,8 @@ const submit = async function () {
     state.switchActivePlayer();
 
   countryView.clearFacts();
-
   await loadCountry();
-
   countryView.renderFlag(state.country.flag);
-
   state.points = 21;
   countryView.renderName(state.points);
 };
@@ -117,19 +109,16 @@ const startNew = async function () {
     countryView.renderName(state.points);
 
     // when a two player game ended and next game will be single player then slide out player 2
-    if (state.singlePlayer && gsap.getProperty('.section__1', 'x') === 39)
+    if (state.singlePlayer && gsap.getProperty('.player__1', 'x') === 39)
       state.playerViews[1].slideOut();
+
     state.playerViews[0].slideIn();
     if (!state.singlePlayer) state.playerViews[1].slideIn();
 
     await wait(1);
-
     consoleView.slideOut();
-
     state.getActivePlayerView().setActive();
-
     controlTimer();
-
     // Adding event handlers to player views
     state.playerViews.forEach(view => {
       view.addHandlerGuess(submit);
@@ -142,14 +131,14 @@ const startNew = async function () {
 };
 // ----------> INIT ---------------
 (async function () {
-  // await wait(0.5);
-  // consoleView.render(flagIcons.generateMarkUp());
-  // await animations.flagAnimation();
+  await wait(0.5);
+  consoleView.render(flagIcons.generateMarkUp());
+  await animations.flagAnimation();
   consoleView.render(
     [gameTitle.generateMarkUp(), menuItems.generateMarkUp()].join('')
   );
-  // animations.titleAnimation();
-  // await wait(1.7);
+  animations.titleAnimation();
+  await wait(1.7);
   await animations.menuItemsAnim();
   consoleView.addHandlerStart(startNew);
 })();

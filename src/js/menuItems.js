@@ -1,9 +1,9 @@
 class MenuItems {
   generateMarkUp() {
     return `
-    <div class="modal__label">players</div>
-    <div class="modal__select">
-      <div class="radio__box">
+    <div class="console__label">players</div>
+    <div class="console__select">
+      <div class="console__radio-box">
         <input
           class="player__1"
           type="radio"
@@ -14,7 +14,7 @@ class MenuItems {
         <label for="player__1">&nbsp1</label>
       </div>
 
-      <div class="radio__box">
+      <div class="console__radio-box">
         <input
           class="player__2"
           type="radio"
@@ -27,9 +27,9 @@ class MenuItems {
       </div>
     </div>
 
-    <div class="modal__label">minutes</div>
-    <div class="modal__select">
-      <div class="radio__box">
+    <div class="console__label">minutes</div>
+    <div class="console__select">
+      <div class="console__radio-box">
         <input
           class="time__1"
           type="radio"
@@ -41,7 +41,7 @@ class MenuItems {
         <label for="time__1">&nbsp1</label>
       </div>
 
-      <div class="radio__box">
+      <div class="console__radio-box">
         <input
           class="time__3"
           type="radio"
@@ -53,7 +53,7 @@ class MenuItems {
         <label for="time__3">&nbsp3</label>
       </div>
 
-      <div class="radio__box">
+      <div class="console__radio-box">
         <input
           class="time__5"
           type="radio"
@@ -65,11 +65,11 @@ class MenuItems {
       </div>
     </div>
 
-    <div class="modal__label">
+    <div class="console__label">
       <!-- <img class="flag__icon" src="./flag.png" alt="" /> -->
       flags</div>
-    <div class="modal__select">
-      <div class="radio__box">
+    <div class="console__select">
+      <div class="console__radio-box">
         <input
           class="flag__1"
           type="radio"
@@ -80,7 +80,7 @@ class MenuItems {
         <label for="flag__1">&nbsp1</label>
       </div>
 
-      <div class="radio__box">
+      <div class="console__radio-box">
         <input
           class="flag__3"
           type="radio"
@@ -91,7 +91,7 @@ class MenuItems {
         <label for="flag__3">&nbsp3</label>
       </div>
 
-      <div class="radio__box">
+      <div class="console__radio-box">
         <input
           class="flag__5"
           type="radio"
@@ -103,7 +103,7 @@ class MenuItems {
         <label for="flag__5">&nbsp5</label>
       </div>
 
-      <div class="radio__box">
+      <div class="console__radio-box">
         <input
           class="flag__10"
           type="radio"

@@ -8,6 +8,7 @@ export class View {
   }
 
   #clear() {
+    console.log(this);
     this.parentElement.innerHTML = '';
   }
 }

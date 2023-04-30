@@ -43,7 +43,7 @@ class GameTitle {
 
   generateMarkUp() {
     return `
-    <div class="game__title">${this.#generateMarkUpElements()}</div>
+    <div class="console__game-title">${this.#generateMarkUpElements()}</div>
     `;
   }
 }

@@ -29,7 +29,7 @@ export default class PlayerView extends View {
     this.#xOffset = xOffset;
 
     this.parentElement = document.querySelector(
-      `.section__${this.#playerNumber}`
+      `.player__${this.#playerNumber}`
     );
 
     this.markUp = this.#generateMarkUp();
@@ -60,8 +60,8 @@ export default class PlayerView extends View {
   }
   #generateMarkUp() {
     return `
-    <div class="timer__container">
-        <div class="timer timer__player${this.#playerNumber}"></div>
+    <div class="timer">
+        <div class="timer__text timer__player${this.#playerNumber}"></div>
         
         <div class="flag__count flag__player${this.#playerNumber}"></div>
     </div>

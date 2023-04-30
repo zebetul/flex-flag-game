@@ -141,7 +141,6 @@ export const loadCountry = async function () {
     );
 
     state.country = createCountryObject(countryData[0]);
-    console.log(countryData[0]);
     console.log(state.country);
   } catch (err) {
     // Temporary error handling
