@@ -2,7 +2,6 @@ import flagIcons from './flagIcons';
 import menuItems from './menuItems';
 import gameTitle from './gameTitle';
 import { wait } from './helpers';
-import * as animations from './animations';
 import Player from './Player';
 import { state, loadCountriesList, loadCountry } from './model';
 import consoleView from './views/Console-View';
@@ -131,14 +130,14 @@ const startNew = async function () {
 };
 // ----------> INIT ---------------
 (async function () {
-  await wait(0.5);
+  await wait(1);
   consoleView.render(flagIcons.generateMarkUp());
-  await animations.flagAnimation();
+  await flagIcons.animate();
   consoleView.render(
     [gameTitle.generateMarkUp(), menuItems.generateMarkUp()].join('')
   );
-  animations.titleAnimation();
-  await wait(1.7);
-  await animations.menuItemsAnim();
+  gameTitle.animate();
+  await wait(0.8);
+  await menuItems.animate();
   consoleView.addHandlerStart(startNew);
 })();

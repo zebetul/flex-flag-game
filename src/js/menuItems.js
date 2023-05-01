@@ -118,5 +118,19 @@ class MenuItems {
     <button class="btn btn__start">New</button>
         `;
   }
+
+  // MENU ITEMS SLIDE IN ANIMATION
+  async animate() {
+    // selecting menu items without title element
+    const [title, ...items] = [...document.querySelector('.console').children];
+
+    // animating items
+    gsap.to(items, {
+      x: '35rem',
+      duration: 0.5,
+      stagger: 0.1,
+      ease: 'back.out(1.5)',
+    });
+  }
 }
 export default new MenuItems();

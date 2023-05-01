@@ -33,6 +33,7 @@ import flag31 from 'url:/assets/flags/31.png';
 import flag32 from 'url:/assets/flags/32.png';
 import flag33 from 'url:/assets/flags/33.png';
 import flag34 from 'url:/assets/flags/34.png';
+import { wait } from './helpers';
 
 class FlagIcons {
   flags = [
@@ -73,19 +74,7 @@ class FlagIcons {
     flag34,
   ];
 
-  // generating markUp to render in consoleView
-  generateMarkUp() {
-    return `
-        <div class="container__console">
-        <div class="console__flags">
-        ${this.#generateFlagMarkup()}
-        </div>
-        </div>
-        `;
-  }
-
-  // part of the markUp
-  #generateFlagMarkup() {
+  #generateFlagsMarkup() {
     return this.flags
       .map(
         (flag, index) =>
@@ -94,6 +83,68 @@ class FlagIcons {
            </div>`
       )
       .join('');
+  }
+  generateMarkUp() {
+    return `
+        <div class="container__console">
+        <div class="console__flags">
+        ${this.#generateFlagsMarkup()}
+        </div>
+        </div>
+        `;
+  }
+
+  // ANIMATION
+  #setFlegsPosition() {
+    this.flags.map((flag, i) =>
+      gsap.set(`.flags__${i}`, {
+        x: `${(i % 5) * 8.3 - 22}rem`,
+        y: `${(i % 7) * 8.8 - 2}rem`,
+        scale: 0,
+        opacity: 0,
+      })
+    );
+  }
+  async #fadingInFlags() {
+    // selecting all flag elements in an array
+    const flags = [...document.querySelectorAll('.flag__intro')];
+    const flagsNumber = flags.length;
+
+    // // animating flag icons
+    for (let i = 0; i <= flagsNumber; i++) {
+      // extracts a random element from the flag elements array and shortens the array to not be able to extract same elem. twice
+      const flag = flags.splice(Math.trunc(Math.random() * flags.length), 1);
+
+      gsap.to(flag, {
+        scale: 0.6,
+        opacity: 0.7,
+        duration: 2.5,
+        ease: 'back.out(9)',
+      });
+
+      await wait(0.05);
+    }
+  }
+  async #slidingOut() {
+    await gsap.to('.flag__intro', {
+      x: '100rem',
+      duration: 0.3,
+      stagger: 0.015,
+      opacity: 0,
+      ease: 'power2.in',
+    });
+  }
+  async animate() {
+    // setting initial position, scale and opacity
+    this.#setFlegsPosition();
+
+    // fading in and scaling up one random flag at a time
+    this.#fadingInFlags();
+
+    await wait(1.7);
+
+    // sliding out flag icon animation
+    await this.#slidingOut();
   }
 }
 export default new FlagIcons();
