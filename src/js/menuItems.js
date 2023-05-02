@@ -35,7 +35,7 @@ class MenuItems {
           type="radio"
           id="time__1"
           name="time"
-          value="0.1"
+          value="0.05"
           checked
         />
         <label for="time__1">&nbsp1</label>
@@ -76,6 +76,7 @@ class MenuItems {
           id="flag__1"
           name="flags"
           value="1"
+          checked
         />
         <label for="flag__1">&nbsp1</label>
       </div>
@@ -98,7 +99,6 @@ class MenuItems {
           id="flag__5"
           name="flags"
           value="5"
-          checked
         />
         <label for="flag__5">&nbsp5</label>
       </div>

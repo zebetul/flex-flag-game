@@ -1,6 +1,6 @@
 import { View } from './View';
 
-class CountryView extends View {
+export default class CountryView extends View {
   #flagElement;
   #nameElement;
   #factsElement;
@@ -43,5 +43,25 @@ class CountryView extends View {
   clearFacts() {
     this.#factsElement.textContent = '';
   }
+  renderWinner(playerName, score) {
+    const markUp = `
+    <div class="score winner">
+      <h1 class="score__player winner__player">Player ${playerName}</h1>
+      <h2 class="score__score winner__score">${score}</h2>
+      <h2 class="winner__medal">🥇</h2>
+    </div>
+    `;
+    this.parentElement.insertAdjacentHTML('afterbegin', markUp);
+
+    gsap.fromTo(
+      '.winner',
+      {
+        scale: 0.2,
+      },
+      {
+        duration: 2,
+        scale: 1.5,
+      }
+    );
+  }
 }
-export default new CountryView();

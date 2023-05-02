@@ -25,6 +25,13 @@
 
   overflow: hidden;
 
+  &__flag {
+    position: absolute;
+    top: 1%;
+    left: 51%;
+    opacity: 0;
+  }
+
   &__label {
     position: relative;
     margin-top: 2rem;

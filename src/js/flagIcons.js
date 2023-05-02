@@ -34,6 +34,7 @@ import flag32 from 'url:/assets/flags/32.png';
 import flag33 from 'url:/assets/flags/33.png';
 import flag34 from 'url:/assets/flags/34.png';
 import { wait } from './helpers';
+import { async } from 'regenerator-runtime';
 
 class FlagIcons {
   flags = [
@@ -74,29 +75,17 @@ class FlagIcons {
     flag34,
   ];
 
-  #generateFlagsMarkup() {
+  generateMarkUp() {
     return this.flags
       .map(
         (flag, index) =>
-          `<div class="flag-icon">
-             <img class="flag__intro flags__${index}" src="${flag}" alt="Flag ${index}">
-           </div>`
+          `<img class="console__flag flags__${index}" src="${flag}" alt="Flag ${index}">`
       )
       .join('');
   }
-  generateMarkUp() {
-    return `
-        <div class="container__console">
-        <div class="console__flags">
-        ${this.#generateFlagsMarkup()}
-        </div>
-        </div>
-        `;
-  }
-
   // ANIMATION
   #setFlegsPosition() {
-    this.flags.map((flag, i) =>
+    this.flags.forEach((flag, i) =>
       gsap.set(`.flags__${i}`, {
         x: `${(i % 5) * 8.3 - 22}rem`,
         y: `${(i % 7) * 8.8 - 2}rem`,
@@ -107,7 +96,7 @@ class FlagIcons {
   }
   async #fadingInFlags() {
     // selecting all flag elements in an array
-    const flags = [...document.querySelectorAll('.flag__intro')];
+    const flags = [...document.querySelectorAll('.console__flag')];
     const flagsNumber = flags.length;
 
     // // animating flag icons
@@ -126,7 +115,7 @@ class FlagIcons {
     }
   }
   async #slidingOut() {
-    await gsap.to('.flag__intro', {
+    await gsap.to('.console__flag', {
       x: '100rem',
       duration: 0.3,
       stagger: 0.015,
@@ -145,6 +134,43 @@ class FlagIcons {
 
     // sliding out flag icon animation
     await this.#slidingOut();
+  }
+  async #throwFlag(i) {
+    let tl = gsap.timeline();
+
+    tl.fromTo(
+      `.flags__${i}`,
+      {
+        top: '100%',
+        left: '40%',
+        scale: 0.2,
+        opacity: 0.5,
+      },
+      {
+        x: -200 + Math.random() * 400,
+        y: -550 + Math.random() * 200,
+        rotation: Math.random() * 5 * 360,
+        // scale: 0.5 + Math.random() * 1,
+
+        scale: 1,
+        opacity: 0.8,
+        duration: 2,
+        ease: 'power4.out',
+      }
+    );
+
+    tl.to(`.flags__${i}`, {
+      opacity: 0,
+      duration: 0.5,
+      // delay: 2,
+    });
+
+    await wait(0.02);
+  }
+  async fireWork() {
+    for (let i = 0; i < 35; i++) {
+      await this.#throwFlag(i);
+    }
   }
 }
 export default new FlagIcons();

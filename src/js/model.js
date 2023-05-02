@@ -9,9 +9,11 @@ export const state = {
   countriesList: [],
   players: [],
   playerViews: [],
+  countryView: {},
   country: {},
   countryGuessed: true,
   gameEnd: false,
+  winner: {},
 
   saveSettings(settings) {
     this.numberOfPlayers = settings.numberOfPlayers;
@@ -72,22 +74,31 @@ export const state = {
     this.gameEnd = false;
   },
   checkGameEnd() {
+    // SINGLE PLAYER
     if (
       this.singlePlayer &&
       (this.getActivePlayer().timeLeft === 0 ||
         this.getActivePlayer().turnsLeft === 0)
     )
-      this.gameEnd = true;
+      return true;
 
+    // DOUBLE PLAYER
     if (
       !this.singlePlayer &&
       ((this.getActivePlayer().timeLeft === 0 &&
         this.restingPlayer().timeLeft === 0) ||
         this.player(1).turnsLeft === 0)
     )
-      this.gameEnd = true;
+      return true;
 
-    return this.gameEnd;
+    return false;
+  },
+  checkWinner() {
+    if (this.players[0].score > this.players[1].score) return this.players[0];
+    if (this.players[0].score < this.players[1].score) return this.players[1];
+    return this.players[0].timeLeft > this.players[1].timeLeft
+      ? this.players[0]
+      : this.players[1];
   },
 };
 
@@ -111,7 +122,6 @@ const createCountryObject = function (data) {
     ],
   };
 };
-
 export const loadCountriesList = async function () {
   try {
     // getting countries list from Rest Countries API
@@ -127,7 +137,6 @@ export const loadCountriesList = async function () {
     throw err;
   }
 };
-
 export const loadCountry = async function () {
   try {
     // selectting a random country name
@@ -141,7 +150,7 @@ export const loadCountry = async function () {
     );
 
     state.country = createCountryObject(countryData[0]);
-    console.log(state.country);
+    // console.log(state.country);
   } catch (err) {
     // Temporary error handling
     console.error(`Country fetching Error:💥💥💥💥 ${err}`);

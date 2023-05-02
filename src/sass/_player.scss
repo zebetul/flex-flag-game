@@ -102,3 +102,14 @@
     align-items: center;
   }
 }
+
+.winner {
+  &__player {
+  }
+  &__score {
+    color: red;
+  }
+  &__medal {
+    font-size: 5rem;
+  }
+}
