@@ -105,11 +105,13 @@
 
 .winner {
   &__player {
+    font-size: 5rem;
   }
   &__score {
+    font-size: 7rem;
     color: red;
   }
   &__medal {
-    font-size: 5rem;
+    font-size: 6rem;
   }
 }

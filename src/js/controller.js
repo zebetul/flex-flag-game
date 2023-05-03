@@ -49,8 +49,8 @@ const endGame = async function () {
   state.countryView.renderWinner(state.winner.number + 1, state.winner.score);
   flagIcons.fireWork();
 
-  // await wait(2);
-  // consoleView.slideIn();
+  await wait(5);
+  consoleView.slideIn();
 };
 const controlFact = function () {
   // if no more facts available then return

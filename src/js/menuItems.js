@@ -9,7 +9,8 @@ class MenuItems {
           type="radio"
           id="player__1"
           name="drone"
-          value="1"          
+          value="1"
+          checked         
         />
         <label for="player__1">&nbsp1</label>
       </div>
@@ -21,7 +22,6 @@ class MenuItems {
           id="player__2"
           name="drone"
           value="2"
-          checked
         />
         <label for="player__2">&nbsp2</label>
       </div>

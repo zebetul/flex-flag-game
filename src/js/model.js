@@ -72,6 +72,7 @@ export const state = {
     this.points = 21;
     this.guessOutcome = false;
     this.gameEnd = false;
+    this.winner = {};
   },
   checkGameEnd() {
     // SINGLE PLAYER

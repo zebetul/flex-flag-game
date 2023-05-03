@@ -47,20 +47,24 @@ export default class CountryView extends View {
     const markUp = `
     <div class="score winner">
       <h1 class="score__player winner__player">Player ${playerName}</h1>
-      <h2 class="score__score winner__score">${score}</h2>
       <h2 class="winner__medal">🥇</h2>
+      <h2 class="score__score winner__score">${score}</h2>
     </div>
     `;
     this.parentElement.insertAdjacentHTML('afterbegin', markUp);
 
     gsap.fromTo(
-      '.winner',
+      '.winner__player, .winner__medal, .winner__score',
       {
-        scale: 0.2,
+        y: 400,
+        scale: 0.1,
       },
       {
         duration: 2,
-        scale: 1.5,
+        stagger: 0.6,
+        y: 0,
+        scale: 1,
+        ease: 'power3.out',
       }
     );
   }

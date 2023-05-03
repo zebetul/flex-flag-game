@@ -141,31 +141,29 @@ class FlagIcons {
     tl.fromTo(
       `.flags__${i}`,
       {
-        top: '100%',
+        top: '110%',
         left: '40%',
         scale: 0.2,
-        opacity: 0.5,
+        opacity: 0,
       },
       {
-        x: -200 + Math.random() * 400,
-        y: -550 + Math.random() * 200,
-        rotation: Math.random() * 5 * 360,
+        x: -300 + Math.random() * 600,
+        y: -1000 + Math.random() * 100,
+        rotation: Math.random() * 4 * 360,
         // scale: 0.5 + Math.random() * 1,
 
         scale: 1,
-        opacity: 0.8,
-        duration: 2,
-        ease: 'power4.out',
+        opacity: 1,
+        duration: 2.5,
+        ease: 'power3.out',
       }
     );
 
     tl.to(`.flags__${i}`, {
-      opacity: 0,
       duration: 0.5,
-      // delay: 2,
     });
 
-    await wait(0.02);
+    await wait(0.1 * Math.random());
   }
   async fireWork() {
     for (let i = 0; i < 35; i++) {
