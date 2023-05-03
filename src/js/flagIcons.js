@@ -144,7 +144,7 @@ class FlagIcons {
         top: '110%',
         left: '40%',
         scale: 0.2,
-        opacity: 0,
+        opacity: 0.3,
       },
       {
         x: -300 + Math.random() * 600,
@@ -152,7 +152,7 @@ class FlagIcons {
         rotation: Math.random() * 4 * 360,
         // scale: 0.5 + Math.random() * 1,
 
-        scale: 1,
+        scale: 1.5,
         opacity: 1,
         duration: 2.5,
         ease: 'power3.out',

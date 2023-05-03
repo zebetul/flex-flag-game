@@ -60,11 +60,11 @@ export default class CountryView extends View {
         scale: 0.1,
       },
       {
-        duration: 2,
+        duration: 1,
         stagger: 0.6,
         y: 0,
         scale: 1,
-        ease: 'power3.out',
+        ease: 'back.out(1.1)',
       }
     );
   }

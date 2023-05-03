@@ -1,3 +1,4 @@
+import { API_URL } from './config';
 import { AJAX } from './helpers';
 
 export const state = {
@@ -126,7 +127,7 @@ const createCountryObject = function (data) {
 export const loadCountriesList = async function () {
   try {
     // getting countries list from Rest Countries API
-    const countriesList = await AJAX('https://restcountries.com/v3.1/all');
+    const countriesList = await AJAX(`${API_URL}all`);
 
     // extracting array with country names and cca2 [countryName, cca2] and saving it to state
     state.countriesList = countriesList
@@ -146,9 +147,7 @@ export const loadCountry = async function () {
     // extracting country and deleting it from the array to not select it again in the same game
     const country = state.countriesList.splice(rnd, 1)[0];
 
-    const countryData = await AJAX(
-      `https://restcountries.com/v3.1/alpha/${country[1]}`
-    );
+    const countryData = await AJAX(`${API_URL}alpha/${country[1]}`);
 
     state.country = createCountryObject(countryData[0]);
     // console.log(state.country);

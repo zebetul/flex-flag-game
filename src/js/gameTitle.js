@@ -31,13 +31,12 @@ class GameTitle {
     <div class="console__game-title">${this.#generateElementsMarkUp()}</div>
     `;
   }
-
   // ANIMATION
   #setElement(cssClass, positionX, positionY, height, rotation, color) {
     gsap.to(`.${cssClass}`, {
       backgroundColor: color,
       position: 'absolute',
-      width: '0.5rem',
+      width: '0.7rem',
       height: '10rem',
       borderRadius: '5px',
       boxShadow: '5px 2px 10px rgba(0, 0, 0, 0.342)',
@@ -45,7 +44,7 @@ class GameTitle {
       y: `${positionY}rem`,
       height: `${height}rem`,
       rotate: `${rotation}deg`,
-      duration: 1,
+      duration: 1.7,
     });
 
     // setting different borderColor depending on backgroundColor
@@ -61,14 +60,14 @@ class GameTitle {
   async #slideIn() {
     await gsap.to('.console__game-title', {
       x: '35rem',
-      duration: 1,
+      duration: 1.2,
       ease: 'back.out(3)',
     });
   }
   async animate() {
     // arrange title elements in FLEX
     this.#elements.forEach(properties => this.#setElement(...properties));
-    // await wait(0.1);
+    await wait(0.4);
     this.#slideIn();
   }
 }

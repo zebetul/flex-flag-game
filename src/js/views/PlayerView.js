@@ -5,6 +5,7 @@ import { View } from './View';
 import flagFilled from 'url:/assets/icons/flag-filled.png';
 import flagRed from 'url:/assets/icons/flag-red.png';
 import flagEmpty from 'url:/assets/icons/flag-empty.png';
+import Player from '../Player';
 
 export default class PlayerView extends View {
   #playerNumber;
@@ -18,6 +19,7 @@ export default class PlayerView extends View {
   #xOffset;
 
   score = 0;
+  inGame = false;
 
   constructor(playerNumber, active, xOffset) {
     super();
@@ -157,7 +159,7 @@ export default class PlayerView extends View {
     await wait(1);
   }
   /**
-   * returns an array with flagNumber elements each element is a flag icon source representing player's turns
+   * Returns an array with flagNumber elements. Each element is a flag icon png file source url, representing player's turns.
    * @param {Player} player
    * @param {Number} flagNumber number of flags icons to be displayed
    * @returns {Array} an array with flag icon png sources
@@ -180,6 +182,12 @@ export default class PlayerView extends View {
 
     return sources;
   }
+  /**
+   * Takes as parameters a player and the number of flags to be displayed. Displays a flag for each turn representing a turn.
+   * @param {Player} player
+   * @param {Number} flagNumber
+   * @author Cristi Sebeni
+   */
   renderFlags(player, flagNumber) {
     this.clearFlags();
 
@@ -232,14 +240,21 @@ export default class PlayerView extends View {
       x: `${this.#xOffset}rem`,
       duration: 1,
       ease: 'circ',
+      opacity: 1,
+      // display: 'flex',
     });
+
+    this.inGame = true;
   }
   slideOut() {
     gsap.to(this.parentElement, {
       x: `0rem`,
       duration: 1,
       ease: 'circ',
+      opacity: 0,
+      // display: 'none',
     });
+    this.inGame = false;
   }
   setActive() {
     this.parentElement.classList.add('player--active');
@@ -248,5 +263,11 @@ export default class PlayerView extends View {
   setInactive() {
     this.parentElement.classList.remove('player--active');
     this.#active = false;
+  }
+  hide() {
+    gsap.to(this.parentElement, {
+      opacity: 0,
+      // display: 'none',
+    });
   }
 }

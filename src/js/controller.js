@@ -44,12 +44,13 @@ const endGame = async function () {
   });
 
   state.winner = state.checkWinner();
-
   state.countryView.render(flagIcons.generateMarkUp());
   state.countryView.renderWinner(state.winner.number + 1, state.winner.score);
   flagIcons.fireWork();
 
   await wait(5);
+  state.playerViews[0].slideOut();
+  state.playerViews[1].slideOut();
   consoleView.slideIn();
 };
 const controlFact = function () {
@@ -101,12 +102,13 @@ const startNew = async function () {
     if (state.gameEnd) state.resetConditions();
 
     state.saveSettings(consoleView.readGameSettings());
+
     state.addPlayer(new Player(0, state.time, state.turns, true));
     state.addPlayer(new Player(1, state.time, state.turns, false));
     state.addPlayerView(new PlayerView(0, true, -39));
     state.addPlayerView(new PlayerView(1, false, 39));
+
     await loadCountriesList();
-    // displaying turns left and countries list for each player
     state.playerViews.forEach((view, i) => {
       view.renderFlags(state.player(i), state.turns);
       view.renderCountriesList(state.countriesList);
@@ -116,10 +118,6 @@ const startNew = async function () {
     state.countryView = new CountryView();
     state.countryView.renderFlag(state.country.flag);
     state.countryView.renderName(state.points);
-
-    // when a two player game ended and next game will be single player then slide out player 2
-    if (state.singlePlayer && gsap.getProperty('.player__1', 'x') === 39)
-      state.playerViews[1].slideOut();
 
     state.playerViews[0].slideIn();
     if (!state.singlePlayer) state.playerViews[1].slideIn();
@@ -140,14 +138,13 @@ const startNew = async function () {
 };
 // ----------> INIT ---------------
 (async function () {
-  // await wait(1);
-  // consoleView.render(flagIcons.generateMarkUp());
-  // await flagIcons.animate();
+  consoleView.render(flagIcons.generateMarkUp());
+  await flagIcons.animate();
   consoleView.render(
     [gameTitle.generateMarkUp(), menuItems.generateMarkUp()].join('')
   );
   gameTitle.animate();
-  await wait(0.8);
+  await wait(1.2);
   await menuItems.animate();
   consoleView.addHandlerStart(startNew);
 })();

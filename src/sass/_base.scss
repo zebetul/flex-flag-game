@@ -1,7 +1,7 @@
-$color-primary: rgba(255, 255, 255, 0.048);
+$color-primary: rgba(255, 255, 255, 0.425);
+$color-primary-light: rgba(255, 255, 255, 0.164);
 $color-secondary: rgb(0, 140, 255);
 $color-tertiary: black;
-$gradient-primary: linear-gradient(135deg, #4e515275 0%, #67608a6c 100%);
 
 * {
   margin: 0;
@@ -20,11 +20,29 @@ body {
   font-family: Poppins;
   height: 100vh;
   color: rgb(255, 255, 255);
-  background-image: $gradient-primary;
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
+
+  background-image: url('/assets/background/backround.jpg');
+  background-size: cover; /* adjust as needed */
+  background-position: center; /* adjust as needed */
+
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    // add a semi-transparent black overlay
+    background-color: rgba(255, 255, 255, 0.336);
+
+    //  apply filters to the overlay
+    filter: blur(3px);
+  }
 }
 
 header {
