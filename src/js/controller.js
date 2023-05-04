@@ -2,6 +2,7 @@ import flagIcons from './flagIcons';
 import menuItems from './menuItems';
 import gameTitle from './gameTitle';
 import { wait } from './helpers';
+import { POINTS_PER_FACT } from './config';
 import Player from './Player';
 import { state, loadCountriesList, loadCountry } from './model';
 import consoleView from './views/Console-View';
@@ -53,15 +54,19 @@ const endGame = async function () {
   consoleView.slideIn();
 };
 const controlFact = function () {
-  // if no more facts available then return
-  if (state.country.facts.length === 0) return;
+  // if guess event allready in course or no more facts available then return
+  if (state.guessEvent || state.country.facts.length === 0) return;
 
   state.countryView.renderFact(state.getFact());
 
-  state.points -= 3;
+  state.points -= POINTS_PER_FACT;
   state.countryView.renderInfo(state.points);
 };
 const submit = async function () {
+  // if guess event allready in course then return
+  if (state.guessEvent) return;
+  state.guessEvent = true;
+
   state.countryView.renderInfo(state.country.name);
   state.checkGuessOutcome();
   state.getActivePlayer().score += state.points;
@@ -86,7 +91,7 @@ const submit = async function () {
     return;
   }
 
-  if (!state.singlePlayer && state.restingPlayer().turnsLeft > 0)
+  if (!state.singlePlayer && state.getRestingPlayer().turnsLeft > 0)
     state.switchActivePlayer();
 
   state.countryView.clearFacts();
@@ -94,6 +99,8 @@ const submit = async function () {
   state.countryView.renderFlag(state.country.flag);
   state.points = 21;
   state.countryView.renderInfo(state.points);
+
+  state.guessEvent = false;
 };
 // ----------> START NEW GAME -------------------------------
 const startNew = async function () {
@@ -141,13 +148,13 @@ const startNew = async function () {
 };
 // ----------> INIT ---------------
 (async function () {
-  consoleView.render(flagIcons.generateMarkUp());
-  await flagIcons.animate();
+  // consoleView.render(flagIcons.generateMarkUp());
+  // await flagIcons.animate();
   consoleView.render(
     [gameTitle.generateMarkUp(), menuItems.generateMarkUp()].join('')
   );
-  gameTitle.animate();
-  await wait(1.2);
+  // gameTitle.animate();
+  // await wait(1.2);
   await menuItems.animate();
   consoleView.addHandlerStart(startNew);
 })();

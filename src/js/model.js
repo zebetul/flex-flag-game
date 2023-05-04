@@ -1,4 +1,4 @@
-import { API_URL } from './config';
+import { API_URL, STARTING_POINTS } from './config';
 import { AJAX } from './helpers';
 
 export const state = {
@@ -6,12 +6,13 @@ export const state = {
   time: 0,
   turns: 0,
   singlePlayer: false,
-  points: 21,
+  points: STARTING_POINTS,
   countriesList: [],
   players: [],
   playerViews: [],
   countryView: {},
   country: {},
+  guessEvent: false,
   countryGuessed: true,
   gameEnd: false,
   winner: {},
@@ -36,7 +37,7 @@ export const state = {
   getActivePlayer() {
     return this.players.find(player => player.active);
   },
-  restingPlayer() {
+  getRestingPlayer() {
     return this.players.find(player => player.active === false);
   },
   getActivePlayerView() {
@@ -88,7 +89,7 @@ export const state = {
     if (
       !this.singlePlayer &&
       ((this.getActivePlayer().timeLeft === 0 &&
-        this.restingPlayer().timeLeft === 0) ||
+        this.getRestingPlayer().timeLeft === 0) ||
         this.player(1).turnsLeft === 0)
     )
       return true;
@@ -114,18 +115,15 @@ const createCountryObject = function (data) {
     name: data.name.common,
     flag: data.flags.png,
     facts: [
-      ['Capital', data.capital ? data.capital[0] : 'no info'],
+      ['Capital', data.capital ? data.capital[0] : 'no information'],
       [
         'Population',
         `${(data.population / 1000000).toFixed(1)} million people`,
       ],
       ['Continent', data.region],
-      ['Languages', data.languages ? Object.values(data.languages) : 'no info'],
-      [
-        'Currency',
-        data.currencies ? Object.values(data.currencies)[0].name : 'no info',
-      ],
-      ['Neighbours', data.borders ? data.borders : 'islands, no neighbours'],
+      // ['Languages', data.languages ? Object.values(data.languages) : 'no info'],
+      // ['Currency', data.currencies ? Object.values(data.currencies)[0].name : 'no info'],
+      ['Neighbours', data.borders ? data.borders : 'no neighbours'],
     ],
   };
 };
@@ -138,6 +136,8 @@ export const loadCountriesList = async function () {
     state.countriesList = countriesList
       .map(country => [country.name.common, country.cca2])
       .sort();
+
+    // console.log(state.countriesList);
   } catch (err) {
     // Temporary error handling
     console.error(`Countries List Error:💥💥💥💥 ${err}`);
@@ -155,7 +155,9 @@ export const loadCountry = async function () {
     const countryData = await AJAX(`${API_URL}alpha/${country[1]}`);
 
     state.country = createCountryObject(countryData[0]);
-    // console.log(state.country);
+
+    console.log(countryData[0]);
+    console.log(state.country);
   } catch (err) {
     // Temporary error handling
     console.error(`Country fetching Error:💥💥💥💥 ${err}`);
