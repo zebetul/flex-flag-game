@@ -96,8 +96,13 @@ export const state = {
     return false;
   },
   checkWinner() {
+    if (this.singlePlayer) return this.players[0];
+
     if (this.players[0].score > this.players[1].score) return this.players[0];
+
     if (this.players[0].score < this.players[1].score) return this.players[1];
+
+    // IF TYE THAN WINNER IS THE PLAYER WITH MORE TIME LEFT
     return this.players[0].timeLeft > this.players[1].timeLeft
       ? this.players[0]
       : this.players[1];
