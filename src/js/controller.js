@@ -63,8 +63,9 @@ const controlFact = function () {
   state.countryView.renderInfo(state.points);
 };
 const submit = async function () {
-  // if guess event allready in course then return
+  // if guess button allready clicked but new country not loaded yet then return
   if (state.guessEvent) return;
+
   state.guessEvent = true;
 
   state.countryView.renderInfo(state.country.name);
@@ -77,33 +78,33 @@ const submit = async function () {
       .renderScore(state.getActivePlayer().score);
 
   if (!state.countryGuessed)
-    state.getActivePlayerView().renderMissedAnimation();
+    await state.getActivePlayerView().renderMissedAnimation();
 
   state.getActivePlayer().guessValues.push(state.countryGuessed);
-  state.getActivePlayer().turnsLeft -= 1;
+  state.getActivePlayer().turnsLeft--;
   state.getActivePlayerView().renderFlags(state.getActivePlayer(), state.turns);
-  await wait(2);
+  await wait(1);
 
-  // ---------->  NO TURNS LEFT END GAME SCENARIOS
   if (state.checkGameEnd()) {
     state.gameEnd = true;
     await endGame();
     return;
   }
 
-  if (!state.singlePlayer && state.getRestingPlayer().turnsLeft > 0)
-    state.switchActivePlayer();
-
   state.countryView.clearFacts();
   await loadCountry();
+
   state.countryView.renderFlag(state.country.flag);
   state.points = 21;
   state.countryView.renderInfo(state.points);
 
+  if (!state.singlePlayer && state.getRestingPlayer().turnsLeft > 0)
+    state.switchActivePlayer();
+
   state.guessEvent = false;
 };
 // ----------> START NEW GAME -------------------------------
-const startNew = async function () {
+const startNewGame = async function () {
   try {
     if (state.gameEnd) state.resetConditions();
 
@@ -120,8 +121,6 @@ const startNew = async function () {
     }
 
     await loadCountriesList();
-    await loadCountry();
-
     // INITIALIZE PLAYER VIEWS WITH DATA AND EVENT HANDLERS AND SLIDE THEM IN GAME
     state.playerViews.forEach((view, i) => {
       view.renderFlags(state.player(i), state.turns);
@@ -131,15 +130,14 @@ const startNew = async function () {
       view.slideIn();
     });
 
+    await loadCountry();
     // CREATE NEW COUNTRY VIEW AND RENDER THE FLAG AND THE POINTS
     state.countryView = new CountryView();
     state.countryView.renderFlag(state.country.flag);
     state.countryView.renderInfo(state.points);
 
     consoleView.slideOut();
-
     state.getActivePlayerView().setActive();
-
     controlTimer();
   } catch (err) {
     state.countryView.render(`💣💣💣 Something went wrong:${err}`);
@@ -148,13 +146,13 @@ const startNew = async function () {
 };
 // ----------> INIT ---------------
 (async function () {
-  // consoleView.render(flagIcons.generateMarkUp());
-  // await flagIcons.animate();
+  consoleView.render(flagIcons.generateMarkUp());
+  await flagIcons.animate();
   consoleView.render(
     [gameTitle.generateMarkUp(), menuItems.generateMarkUp()].join('')
   );
-  // gameTitle.animate();
-  // await wait(1.2);
+  gameTitle.animate();
+  await wait(1.2);
   await menuItems.animate();
-  consoleView.addHandlerStart(startNew);
+  consoleView.addHandlerStart(startNewGame);
 })();

@@ -1,26 +1,19 @@
-/* ------------------ MODAL WINDOW ------------- */
 .console {
   position: absolute;
-
   left: 50%;
   transform: translate(-50%, 0%);
   height: 60rem;
   width: 40rem;
 
-  padding: 23rem 10rem 0 10rem;
-
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: $color-tertiary;
-  /* filter: brightness(0.8); */
-  /* filter: opacity(0.8); */
 
-  /* box-shadow: 20px 20px 60px 26px rgba(0, 0, 0, 0.062); */
+  padding: 23rem 10rem 0 10rem;
+  color: $color-tertiary;
   background-color: rgb(227, 226, 230);
   border-radius: 10px;
-  border: 1px solid rgba(0, 140, 255, 0.5);
-  font-size: 1.5rem;
+  border: $border;
   z-index: 100;
 
   overflow: hidden;
@@ -53,24 +46,17 @@
     top: 9rem;
     left: -30rem;
     transform: translate(-50%, -50%);
+
     display: flex;
     overflow: visible;
     z-index: 1000;
-
-    outline: auto;
   }
 
   &__radio-box {
     display: flex;
     justify-content: center;
-
-    /* margin: 1rem 2rem; */
     width: 4rem;
-    /* padding-left: 15rem; */
-    /* margin-left: 1rem; */
-
     color: $color-tertiary;
-    font-size: 1.5rem;
   }
 
   &__radio-box:checked {

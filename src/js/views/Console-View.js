@@ -5,11 +5,9 @@ class ConsoleView extends View {
     super();
     this.parentElement = document.querySelector('.console');
   }
-
   addHandlerStart(handler) {
     document.querySelector('.btn__start').addEventListener('click', handler);
   }
-
   slideOut() {
     gsap.to(this.parentElement, {
       y: '-80rem',
@@ -17,7 +15,6 @@ class ConsoleView extends View {
       duration: 1,
     });
   }
-
   slideIn() {
     gsap.to(this.parentElement, {
       y: '0rem',
@@ -26,7 +23,6 @@ class ConsoleView extends View {
       duration: 1,
     });
   }
-
   readGameSettings() {
     // getting players number
     const plNrNodeList = document.getElementsByName('drone');

@@ -3,31 +3,34 @@ $color-primary-light: rgba(255, 255, 255, 0.164);
 $color-secondary: rgb(0, 140, 255);
 $color-tertiary: black;
 
+$border: 1px solid rgba(0, 140, 255, 0.5);
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: inherit;
 }
 
-/* Adjust the default font size in body to rem to be more responsive */
+//  Adjust the default font size in body to rem to be more responsive
 html {
   font-size: 62.5%;
 }
 
 body {
   box-sizing: border-box;
-  font-size: 1.6rem;
-  font-family: Poppins;
-  height: 100vh;
-  color: rgb(255, 255, 255);
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 100vh;
+
+  font-size: 1.6rem;
+  font-family: Poppins;
+  color: rgb(255, 255, 255);
   overflow: hidden;
 
-  background-image: url('/assets/background/backround.jpg');
-  background-size: cover; /* adjust as needed */
-  background-position: center; /* adjust as needed */
+  background-image: url('/src/assets/background/backround.jpg');
+  background-size: cover;
+  background-position: center;
 
   &::before {
     content: '';
@@ -43,10 +46,6 @@ body {
     //  apply filters to the overlay
     filter: blur(3px);
   }
-}
-
-header {
-  font-size: 4rem;
 }
 
 main {

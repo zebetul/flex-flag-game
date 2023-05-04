@@ -58,6 +58,9 @@ export const state = {
       1
     )[0];
   },
+  /**
+   * sets state.countryGuessed boolean according to guess outcome
+   */
   checkGuessOutcome() {
     if (this.country.name !== this.getActivePlayerView().getCountry()) {
       this.countryGuessed = false;
@@ -75,6 +78,7 @@ export const state = {
     this.guessOutcome = false;
     this.gameEnd = false;
     this.winner = {};
+    this.guessEvent = false;
   },
   checkGameEnd() {
     // SINGLE PLAYER
@@ -139,7 +143,6 @@ export const loadCountriesList = async function () {
 
     // console.log(state.countriesList);
   } catch (err) {
-    // Temporary error handling
     console.error(`Countries List Error:💥💥💥💥 ${err}`);
     throw err;
   }
@@ -148,19 +151,13 @@ export const loadCountry = async function () {
   try {
     // selectting a random country name
     const rnd = Math.trunc(Math.random() * state.countriesList.length);
-
     // extracting country and deleting it from the array to not select it again in the same game
     const country = state.countriesList.splice(rnd, 1)[0];
 
     const countryData = await AJAX(`${API_URL}alpha/${country[1]}`);
-
     state.country = createCountryObject(countryData[0]);
-
-    // console.log(countryData[0]);
-    // console.log(state.country);
   } catch (err) {
-    // Temporary error handling
-    console.error(`Country fetching Error:💥💥💥💥 ${err}`);
+    console.error(`Country fetching Error:💥💥💥💥 ${err.message}`);
     throw err;
   }
 };

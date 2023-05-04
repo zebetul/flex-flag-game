@@ -35,8 +35,7 @@ class MenuItems {
           type="radio"
           id="time__1"
           name="time"
-          value="0.05"
-          checked
+          value="1"          
         />
         <label for="time__1">&nbsp1</label>
       </div>
@@ -48,7 +47,7 @@ class MenuItems {
           id="time__3"
           name="time"
           value="3"
-          
+          checked
         />
         <label for="time__3">&nbsp3</label>
       </div>
@@ -75,8 +74,7 @@ class MenuItems {
           type="radio"
           id="flag__1"
           name="flags"
-          value="1"
-          checked
+          value="1"          
         />
         <label for="flag__1">&nbsp1</label>
       </div>
@@ -99,6 +97,7 @@ class MenuItems {
           id="flag__5"
           name="flags"
           value="5"
+          checked
         />
         <label for="flag__5">&nbsp5</label>
       </div>
@@ -115,16 +114,14 @@ class MenuItems {
       </div>
     </div>
 
-    <button class="btn btn__start">New</button>
+    <button class="btn btn__start">Start</button>
         `;
   }
-
-  // MENU ITEMS SLIDE IN ANIMATION
   async animate() {
     // selecting menu items without title element
     const [title, ...items] = [...document.querySelector('.console').children];
 
-    // animating items
+    // animate items using gsap
     gsap.to(items, {
       x: '35rem',
       duration: 0.5,

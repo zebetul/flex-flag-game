@@ -2,9 +2,9 @@ import { wait, formatTimer } from '../helpers';
 import { TIME_WARNING } from '../config';
 import { View } from './View';
 
-import flagFilled from 'url:/assets/icons/flag-filled.png';
-import flagRed from 'url:/assets/icons/flag-red.png';
-import flagEmpty from 'url:/assets/icons/flag-empty.png';
+import flagFilled from 'url:/src/assets/icons/flag-filled.png';
+import flagRed from 'url:/src/assets/icons/flag-red.png';
+import flagEmpty from 'url:/src/assets/icons/flag-empty.png';
 import Player from '../Player';
 
 export default class PlayerView extends View {
@@ -223,7 +223,7 @@ export default class PlayerView extends View {
       color: 'rgb(0, 140, 255)',
     });
   }
-  renderMissedAnimation() {
+  async renderMissedAnimation() {
     gsap.to(this.#countriesListElement, {
       backgroundColor: 'red',
       // fontSize: '2rem',
@@ -234,6 +234,8 @@ export default class PlayerView extends View {
       // yoyoEase: true,
       duration: 1,
     });
+
+    await wait(1);
   }
   slideIn() {
     gsap.to(this.parentElement, {
