@@ -24,7 +24,7 @@ export default class CountryView extends View {
     <div class="country__data"></div>
     `;
   }
-  renderName(content) {
+  renderInfo(content) {
     this.#nameElement.textContent = content;
   }
   renderFlag(source) {

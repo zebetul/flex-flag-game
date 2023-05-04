@@ -49,8 +49,7 @@ const endGame = async function () {
   flagIcons.fireWork();
 
   await wait(5);
-  state.playerViews[0].slideOut();
-  state.playerViews[1].slideOut();
+  state.playerViews.forEach(view => view.slideOut());
   consoleView.slideIn();
 };
 const controlFact = function () {
@@ -60,10 +59,10 @@ const controlFact = function () {
   state.countryView.renderFact(state.getFact());
 
   state.points -= 3;
-  state.countryView.renderName(state.points);
+  state.countryView.renderInfo(state.points);
 };
 const submit = async function () {
-  state.countryView.renderName(state.country.name);
+  state.countryView.renderInfo(state.country.name);
   state.checkGuessOutcome();
   state.getActivePlayer().score += state.points;
 
@@ -94,7 +93,7 @@ const submit = async function () {
   await loadCountry();
   state.countryView.renderFlag(state.country.flag);
   state.points = 21;
-  state.countryView.renderName(state.points);
+  state.countryView.renderInfo(state.points);
 };
 // ----------> START NEW GAME -------------------------------
 const startNew = async function () {
@@ -103,34 +102,38 @@ const startNew = async function () {
 
     state.saveSettings(consoleView.readGameSettings());
 
+    // CREATE FIRST PLAYER AND IT'S VIEW
     state.addPlayer(new Player(0, state.time, state.turns, true));
-    state.addPlayer(new Player(1, state.time, state.turns, false));
     state.addPlayerView(new PlayerView(0, true, -39));
-    state.addPlayerView(new PlayerView(1, false, 39));
+
+    // IF TWO PLAYER GAME, CREATE SECOND PLAYER AND IT'S VIEW
+    if (!state.singlePlayer) {
+      state.addPlayer(new Player(1, state.time, state.turns, false));
+      state.addPlayerView(new PlayerView(1, false, 39));
+    }
 
     await loadCountriesList();
+    await loadCountry();
+
+    // INITIALIZE PLAYER VIEWS WITH DATA AND EVENT HANDLERS AND SLIDE THEM IN GAME
     state.playerViews.forEach((view, i) => {
       view.renderFlags(state.player(i), state.turns);
       view.renderCountriesList(state.countriesList);
-    });
-
-    await loadCountry();
-    state.countryView = new CountryView();
-    state.countryView.renderFlag(state.country.flag);
-    state.countryView.renderName(state.points);
-
-    state.playerViews[0].slideIn();
-    if (!state.singlePlayer) state.playerViews[1].slideIn();
-
-    await wait(1);
-    consoleView.slideOut();
-    state.getActivePlayerView().setActive();
-    controlTimer();
-    // Adding event handlers to player views
-    state.playerViews.forEach(view => {
       view.addHandlerGuess(submit);
       view.addHandlerHelp(controlFact);
+      view.slideIn();
     });
+
+    // CREATE NEW COUNTRY VIEW AND RENDER THE FLAG AND THE POINTS
+    state.countryView = new CountryView();
+    state.countryView.renderFlag(state.country.flag);
+    state.countryView.renderInfo(state.points);
+
+    consoleView.slideOut();
+
+    state.getActivePlayerView().setActive();
+
+    controlTimer();
   } catch (err) {
     state.countryView.render(`💣💣💣 Something went wrong:${err}`);
     console.error(err);
