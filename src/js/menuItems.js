@@ -115,6 +115,17 @@ class MenuItems {
     </div>
 
     <button class="btn btn__start">Start</button>
+
+    <div class="console__disclaimer">
+        <span class="console__disclaimer-text">
+          © 2023 - Developed by Cristian Sebeni
+        </span>
+        <span>
+          <a href="https://github.com/zebetul">
+            <i class="fab fa-github console__disclaimer-icon"></i>
+          </a>
+        </span>
+    </div>
         `;
   }
   async animate() {

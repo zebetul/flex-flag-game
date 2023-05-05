@@ -62,4 +62,27 @@
   &__radio-box:checked {
     opacity: 1;
   }
+
+  &__disclaimer {
+    position: absolute;
+    left: -25rem;
+    bottom: 0%;
+
+    font-size: 1rem;
+    color: $color-secondary;
+
+    &-text {
+      opacity: 0.7;
+    }
+
+    & i {
+      font-size: 1.5rem;
+      color: $color-secondary;
+      opacity: 0.7;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
 }
